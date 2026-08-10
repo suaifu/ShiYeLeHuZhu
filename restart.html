@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重启 · 失业人群互助平台</title>
+    <style>
+        :root {
+            --bg: #f5f0e8;
+            --bg-deep: #ebe4d8;
+            --surface: #faf7f2;
+            --surface-alt: #fff8ee;
+            --accent: #c4553a;
+            --accent-soft: #e87f64;
+            --accent-pale: rgba(196,85,58,0.08);
+            --gold: #c9982e;
+            --gold-soft: #f0d68a;
+            --blue: #3d7ab5;
+            --green: #4a9a60;
+            --purple: #7b5ea7;
+            --teal: #2e9e8f;
+            --text: #2a2420;
+            --text-muted: #7a7068;
+            --text-light: #a89e94;
+            --border: #e0d8cc;
+            --shadow: rgba(42,36,32,0.06);
+            --shadow-lg: rgba(42,36,32,0.12);
+            --radius: 1rem;
+            --radius-sm: 0.6rem;
+            --font-serif: "Songti SC", "STSong", "SimSun", "Noto Serif SC", serif;
+            --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth;font-size:16px}
+        body{font-family:var(--font-sans);background:var(--bg);color:var(--text);line-height:1.8;overflow-x:hidden;transition:background .5s,color .5s}
+
+        ::-webkit-scrollbar{width:8px}
+        ::-webkit-scrollbar-track{background:var(--bg-deep)}
+        ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+        ::-webkit-scrollbar-thumb:hover{background:var(--text-light)}
+
+        body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+
+        .toast-container{position:fixed;top:5rem;right:2rem;z-index:9000;display:flex;flex-direction:column;gap:.5rem}
+        .toast{background:var(--text);color:#f0ece4;padding:1rem 1.5rem;border-radius:.7rem;font-size:.88rem;display:flex;align-items:center;gap:.6rem;transform:translateX(120%);transition:transform .4s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 8px 30px rgba(0,0,0,.15);max-width:340px}
+        .toast.show{transform:translateX(0)}
+        .toast-icon{font-size:1.1rem;flex-shrink:0}
+
+        .container{max-width:1200px;margin:0 auto;padding:0 2rem}
+        .serif{font-family:var(--font-serif)}
+        .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+        .reveal.visible{opacity:1;transform:translateY(0)}
+        .reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}.reveal-d4{transition-delay:.4s}.reveal-d5{transition-delay:.5s}
+        .reveal-left{opacity:0;transform:translateX(-30px);transition:opacity .7s ease,transform .7s ease}
+        .reveal-left.visible{opacity:1;transform:translateX(0)}
+        .reveal-right{opacity:0;transform:translateX(30px);transition:opacity .7s ease,transform .7s ease}
+        .reveal-right.visible{opacity:1;transform:translateX(0)}
+
+        .wave-divider{width:100%;overflow:hidden;line-height:0;margin-top:-1px}
+        .wave-divider svg{width:100%;height:50px;display:block}
+
+        /* SVG ICON SYSTEM */
+        .ico{width:1em;height:1em;display:inline-block;vertical-align:-0.125em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+        nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 3rem;display:flex;justify-content:space-between;align-items:center;transition:all .4s}
+        nav.scrolled{background:rgba(245,240,232,.92);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--border)}
+        .logo{font-family:var(--font-serif);font-weight:900;font-size:1.35rem;color:var(--accent);letter-spacing:.05em;text-decoration:none;display:flex;align-items:center;gap:.5rem}
+        .logo small{color:var(--text-muted);font-weight:400;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-family:var(--font-sans)}
+        .nav-links{display:flex;gap:2.2rem;list-style:none;align-items:center}
+        .nav-links a{text-decoration:none;color:var(--text-muted);font-size:.85rem;font-weight:500;letter-spacing:.06em;transition:color .3s;position:relative}
+        .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--accent);transition:width .3s}
+        .nav-links a:hover{color:var(--accent)}
+        .nav-links a:hover::after{width:100%}
+        .nav-cta{padding:.55rem 1.3rem!important;background:var(--accent);color:#fff!important;border-radius:.4rem;font-size:.8rem!important}
+        .nav-cta::after{display:none!important}
+        .nav-cta:hover{background:#a94430!important}
+        .nav-right{display:flex;align-items:center;gap:1rem}
+        .nav-mobile{display:none;background:none;border:none;cursor:pointer;padding:.5rem;z-index:200}
+        .nav-mobile span{display:block;width:22px;height:2px;background:var(--text);margin:5px 0;transition:all .3s;transform-origin:center}
+        .nav-mobile.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+        .nav-mobile.active span:nth-child(2){opacity:0}
+        .nav-mobile.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+        .mobile-overlay{display:none;position:fixed;inset:0;background:rgba(42,36,32,.4);z-index:99;backdrop-filter:blur(4px)}
+        .mobile-overlay.show{display:block}
+
+        .hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden}
+        .hero-bg{position:absolute;inset:0;z-index:0}
+        .hero-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(196,85,58,.05),transparent 50%),radial-gradient(ellipse at 20% 80%,rgba(201,152,46,.04),transparent 50%)}
+        .hero-bg .deco-circle{position:absolute;border-radius:50%;border:1px solid var(--border);opacity:.4}
+        .hero-bg .dc1{width:400px;height:400px;top:-100px;right:-80px;animation:floatSlow 20s ease-in-out infinite}
+        .hero-bg .dc2{width:250px;height:250px;bottom:10%;left:5%;animation:floatSlow 25s ease-in-out infinite reverse}
+        .hero-bg .dc3{width:150px;height:150px;top:30%;left:40%;animation:floatSlow 18s ease-in-out infinite}
+        @keyframes floatSlow{0%,100%{transform:translate(0,0)}50%{transform:translate(15px,-20px)}}
+        .hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1.1fr .9fr;gap:5rem;align-items:center;padding:8rem 0 6rem}
+        .hero-tag{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--accent);background:var(--accent-pale);padding:.5rem 1.2rem;border-radius:2rem;margin-bottom:2rem}
+        .hero-tag .pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+        .hero h1{font-family:var(--font-serif);font-weight:900;font-size:3.6rem;line-height:1.25;color:var(--text);margin-bottom:1.5rem}
+        .hero h1 em{font-style:normal;color:var(--accent);position:relative;display:inline-block}
+        .hero h1 em::after{content:'';position:absolute;bottom:.08em;left:-.1em;right:-.1em;height:.2em;background:var(--gold-soft);opacity:.4;z-index:-1;border-radius:.15em}
+        .hero-desc{font-size:1.08rem;color:var(--text-muted);line-height:2;margin-bottom:2.5rem;max-width:500px}
+        .hero-actions{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+        .hero-note{margin-top:1.5rem;font-size:.82rem;color:var(--text-light);display:flex;align-items:center;gap:.5rem}
+        .hero-trust{margin-top:2.5rem}
+        .hero-trust-label{font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:.6rem}
+        .hero-trust-logos{display:flex;gap:2rem;align-items:center;flex-wrap:wrap}
+        .hero-trust-logos a{font-size:.78rem;color:var(--text-light);opacity:.6;font-weight:500;text-decoration:none;transition:opacity .3s}
+        .hero-trust-logos a:hover{opacity:1;color:var(--accent)}
+        .hero-stats{animation:fadeIn 1s ease .4s both}
+        .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.6rem 1.4rem;transition:all .35s;position:relative;overflow:hidden}
+        .stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px var(--shadow)}
+        .stat-card:nth-child(2){transform:translateY(1.5rem)}
+        .stat-card:nth-child(2):hover{transform:translateY(calc(1.5rem - 3px))}
+        .stat-card:nth-child(3){transform:translateY(-1rem)}
+        .stat-card:nth-child(3):hover{transform:translateY(calc(-1rem - 3px))}
+        .stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:2px}
+        .stat-card:nth-child(1)::before{background:var(--accent)}.stat-card:nth-child(2)::before{background:var(--gold)}
+        .stat-card:nth-child(3)::before{background:var(--blue)}.stat-card:nth-child(4)::before{background:var(--green)}
+        .stat-num{font-family:var(--font-serif);font-weight:900;font-size:2.2rem;line-height:1;margin-bottom:.4rem}
+        .stat-num.red{color:var(--accent)}.stat-num.gold{color:var(--gold)}.stat-num.blue{color:var(--blue)}.stat-num.green{color:var(--green)}
+        .stat-label{font-size:.8rem;color:var(--text-muted)}
+        .stat-sub{font-size:.7rem;color:var(--text-light);margin-top:.2rem}
+
+        /* Ring Chart */
+        .stat-card.ring-card{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+        .ring-chart{position:relative;width:110px;height:110px;margin-bottom:.6rem}
+        .ring-svg{width:100%;height:100%;transform:rotate(-90deg)}
+        .ring-track{fill:none;stroke:var(--border);stroke-width:6}
+        .ring-fill-arc{fill:none;stroke:var(--green);stroke-width:6;stroke-linecap:round;stroke-dasharray:289.03;stroke-dashoffset:289.03;transition:stroke-dashoffset 1.6s cubic-bezier(.22,1,.36,1)}
+        .ring-fill-arc.animated{stroke-dashoffset:80.93}
+        .ring-value{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:1px}
+        .ring-num-val{font-family:var(--font-serif);font-weight:900;font-size:28px;color:var(--green);line-height:1}
+        .ring-pct-val{font-family:var(--font-serif);font-size:12px;color:var(--text-muted);align-self:flex-start;margin-top:4px}
+
+        /* Spotlight Story */
+        .story-spotlight{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.4fr;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);margin-bottom:1.5rem;transition:all .35s}
+        .story-spotlight:hover{border-color:var(--accent);box-shadow:0 12px 40px var(--shadow)}
+        .spotlight-visual{min-height:280px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(196,85,58,.08),rgba(201,152,46,.06))}
+        .spotlight-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 65%,var(--surface))}
+        .spotlight-icon-wrap{position:relative;z-index:1;width:100px;height:100px;border-radius:50%;background:rgba(196,85,58,.1);display:flex;align-items:center;justify-content:center;transform:rotate(-3deg)}
+        .spotlight-icon-wrap svg{width:48px;height:48px;color:var(--accent)}
+        .spotlight-body{padding:2rem 2.2rem;display:flex;flex-direction:column;justify-content:center;gap:.8rem}
+        .spotlight-tag{display:inline-flex;align-items:center;gap:.3rem;font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);background:var(--accent-pale);padding:.3rem .8rem;border-radius:2rem;width:fit-content}
+        .spotlight-body .story-quote{font-size:1.05rem;line-height:2;border-left:2px solid var(--gold-soft);padding-left:1rem;margin:0}
+        .spotlight-body .story-author{padding-top:.6rem}
+        .spotlight-body .story-outcome{margin-top:0}
+
+        /* Quick Nav Sidebar */
+        .quick-nav{position:fixed;right:1.5rem;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:.5rem;background:var(--surface);border:1px solid var(--border);border-radius:2rem;padding:.8rem .6rem;box-shadow:0 4px 20px var(--shadow);opacity:0;pointer-events:none;transition:opacity .3s}
+        .quick-nav.show{opacity:1;pointer-events:auto}
+        .quick-nav-item{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);text-decoration:none;transition:all .25s;cursor:pointer;border:none;background:none;font-family:inherit;position:relative}
+        .quick-nav-item:hover{background:var(--accent-pale);color:var(--accent)}
+        .quick-nav-item.active{background:var(--accent);color:#fff}
+        .quick-nav-item::after{content:attr(data-label);position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--text);color:#f0ece4;font-size:11px;padding:.25rem .6rem;border-radius:.3rem;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+        .quick-nav-item:hover::after{opacity:1}
+        .quick-nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+        @media(max-width:1024px){.quick-nav{display:none!important}}
+
+        .btn{display:inline-flex;align-items:center;gap:.6rem;padding:1rem 2rem;border-radius:.5rem;font-size:.95rem;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:all .3s;text-decoration:none;font-family:inherit;border:none;position:relative;overflow:hidden}
+        .btn-primary{background:var(--accent);color:#fff}
+        .btn-primary:hover{background:#a94430;transform:translateY(-2px);box-shadow:0 8px 24px rgba(196,85,58,.25)}
+        .btn-outline{background:transparent;color:var(--text-muted);border:1.5px solid var(--border)}
+        .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+        .btn-dark{background:var(--text);color:#f0ece4}
+        .btn-dark:hover{background:#3d3630;transform:translateY(-2px)}
+        .btn-sm{padding:.6rem 1.3rem;font-size:.85rem}
+        .btn-ghost{background:transparent;color:var(--accent);border:none;padding:.6rem 1rem;font-size:.85rem;font-weight:600}
+        .btn-ghost:hover{background:var(--accent-pale)}
+
+        .prototype-tag{display:inline-block;font-size:.65rem;font-weight:600;letter-spacing:.1em;padding:.15rem .5rem;border-radius:.3rem;background:rgba(201,152,46,.12);color:var(--gold);margin-left:.5rem;vertical-align:middle}
+
+        section{padding:7rem 0}
+        .section-head{text-align:center;max-width:640px;margin:0 auto 4rem}
+        .section-head.left{text-align:left;margin:0 0 3.5rem}
+        .section-label{font-size:.7rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem}
+        .section-title{font-family:var(--font-serif);font-weight:900;font-size:2.5rem;line-height:1.3;margin-bottom:1rem}
+        .section-desc{color:var(--text-muted);font-size:1.02rem;line-height:1.9}
+        .divider{width:40px;height:3px;background:var(--accent);border-radius:2px;margin:1.5rem auto}
+
+        .marquee-bar{overflow:hidden;background:var(--text);padding:.8rem 0;position:relative}
+        .marquee-bar::before,.marquee-bar::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2}
+        .marquee-bar::before{left:0;background:linear-gradient(to right,var(--text),transparent)}
+        .marquee-bar::after{right:0;background:linear-gradient(to left,var(--text),transparent)}
+        .marquee-track{display:flex;animation:marquee 45s linear infinite;white-space:nowrap}
+        .marquee-item{color:rgba(240,236,228,.35);font-size:.75rem;letter-spacing:.12em;font-weight:500;padding:0 3rem;flex-shrink:0}
+        .marquee-item span{color:var(--accent-soft);margin-right:.5rem}
+        @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+        .problems{background:var(--bg-deep)}
+        .problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+        .problem-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2.2rem 1.8rem;position:relative;overflow:hidden;transition:all .35s}
+        .problem-card:hover{transform:translateY(-5px);box-shadow:0 20px 50px var(--shadow-lg)}
+        .problem-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-accent,var(--accent));transform:scaleX(0);transform-origin:left;transition:transform .4s ease}
+        .problem-card:hover::before{transform:scaleX(1)}
+        .problem-icon{width:3.2rem;height:3.2rem;border-radius:.7rem;display:flex;align-items:center;justify-content:center;margin-bottom:1.3rem;transition:transform .3s}
+        .problem-card:hover .problem-icon{transform:scale(1.1) rotate(-5deg)}
+        .problem-icon svg{width:1.6rem;height:1.6rem}
+        .pi-red{background:rgba(196,85,58,.1);--card-accent:var(--accent);color:var(--accent)}
+        .pi-gold{background:rgba(201,152,46,.1);--card-accent:var(--gold);color:var(--gold)}
+        .pi-blue{background:rgba(61,122,181,.1);--card-accent:var(--blue);color:var(--blue)}
+        .pi-green{background:rgba(74,154,96,.1);--card-accent:var(--green);color:var(--green)}
+        .pi-purple{background:rgba(123,94,167,.1);--card-accent:var(--purple);color:var(--purple)}
+        .pi-teal{background:rgba(46,158,143,.1);--card-accent:var(--teal);color:var(--teal)}
+        .problem-card h3{font-family:var(--font-serif);font-weight:700;font-size:1.15rem;margin-bottom:.6rem}
+        .problem-card p{color:var(--text-muted);font-size:.88rem;line-height:1.85}
+
+        .reality-section{background:var(--text);color:#f0ece4;position:relative;overflow:hidden}
+        .reality-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(196,85,58,.08),transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(201,152,46,.06),transparent 40%);pointer-events:none}
+        .reality-section .section-label{color:var(--gold-soft)}
+        .reality-section .section-title{color:#f0ece4}
+        .reality-section .section-desc{color:rgba(240,236,228,.45)}
+        .reality-section .divider{background:var(--gold-soft);opacity:.5}
+        .reality-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem}
+        .reality-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:2rem;transition:all .35s}
+        .reality-card:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);transform:translateY(-3px)}
+        .reality-card .big-num{font-family:var(--font-serif);font-weight:900;font-size:2.8rem;line-height:1;margin-bottom:.5rem}
+        .reality-card .big-num.c1{color:var(--accent-soft)}.reality-card .big-num.c2{color:var(--gold-soft)}.reality-card .big-num.c3{color:#90c0e0}
+        .reality-card h4{font-weight:600;font-size:1rem;margin-bottom:.5rem;color:rgba(240,236,228,.9)}
+        .reality-card p{font-size:.88rem;color:rgba(240,236,228,.45);line-height:1.8}
+
+        .trends-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+        .trend-list{display:flex;flex-direction:column;gap:1rem}
+        .trend-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.3rem;background:var(--surface);border:1px solid var(--border);border-radius:.7rem;transition:all .3s}
+        .trend-item:hover{border-color:var(--accent);box-shadow:0 4px 16px var(--shadow)}
+        .trend-icon{width:2.8rem;height:2.8rem;border-radius:.6rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .trend-icon svg{width:1.4rem;height:1.4rem}
+        .ti-up{background:rgba(74,154,96,.1);color:var(--green)}.ti-hot{background:rgba(196,85,58,.1);color:var(--accent)}.ti-new{background:rgba(61,122,181,.1);color:var(--blue)}.ti-steady{background:rgba(201,152,46,.1);color:var(--gold)}
+        .trend-info{flex:1}
+        .trend-info h4{font-size:.88rem;font-weight:600;margin-bottom:.1rem}
+        .trend-info span{font-size:.75rem;color:var(--text-muted)}
+        .trend-bar-track{flex:0 0 100px;height:6px;background:var(--bg-deep);border-radius:3px;overflow:hidden}
+        .trend-bar-fill{height:100%;border-radius:3px;transition:width 1.2s ease}
+        .tbf-green{background:var(--green)}.tbf-red{background:var(--accent)}.tbf-blue{background:var(--blue)}.tbf-gold{background:var(--gold)}
+        .trend-percent{flex:0 0 50px;text-align:right;font-family:var(--font-serif);font-weight:700;font-size:.85rem}
+        .tp-up{color:var(--green)}.tp-hot{color:var(--accent)}.tp-new{color:var(--blue)}.tp-steady{color:var(--gold)}
+        .trend-note{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;position:sticky;top:6rem}
+        .trend-note h3{font-family:var(--font-serif);font-weight:700;font-size:1.15rem;margin-bottom:1rem}
+        .trend-note p{font-size:.88rem;color:var(--text-muted);line-height:1.8;margin-bottom:.8rem}
+        .trend-note .highlight-box{background:rgba(74,154,96,.06);border:1px solid rgba(74,154,96,.15);border-radius:.6rem;padding:1.2rem;margin-top:1rem}
+        .trend-note .highlight-box h5{font-size:.85rem;font-weight:700;color:var(--green);margin-bottom:.4rem}
+        .trend-note .highlight-box p{font-size:.82rem;margin-bottom:0}
+
+        .resource-filter{display:flex;gap:.5rem;margin-bottom:2rem;flex-wrap:wrap;justify-content:center}
+        .filter-btn{padding:.45rem 1.1rem;border:1.5px solid var(--border);border-radius:2rem;font-size:.8rem;font-weight:500;cursor:pointer;transition:all .3s;background:transparent;color:var(--text-muted);font-family:inherit}
+        .filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+        .filter-btn:hover:not(.active){border-color:var(--accent);color:var(--accent)}
+        .resource-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+        .resource-card{display:flex;gap:1.4rem;padding:2rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);text-decoration:none;color:inherit;transition:all .35s;position:relative;overflow:hidden}
+        .resource-card:hover{border-color:var(--accent);box-shadow:0 12px 40px var(--shadow);transform:translateY(-3px)}
+        .resource-card::after{content:'->';position:absolute;right:1.5rem;top:1.5rem;font-size:1.1rem;color:var(--border);transition:all .3s}
+        .resource-card:hover::after{color:var(--accent);transform:translateX(4px)}
+        .resource-card.hidden{display:none}
+        .r-num{font-family:var(--font-serif);font-weight:900;font-size:2rem;color:var(--border);line-height:1;flex-shrink:0;transition:color .3s}
+        .resource-card:hover .r-num{color:var(--accent)}
+        .r-info h4{font-weight:700;font-size:1rem;margin-bottom:.35rem}
+        .r-info p{font-size:.85rem;color:var(--text-muted);line-height:1.75}
+        .r-tag{display:inline-block;font-size:.68rem;font-weight:600;letter-spacing:.1em;padding:.2rem .6rem;border-radius:.3rem;margin-top:.5rem}
+        .tag-fin{color:var(--accent);background:var(--accent-pale)}
+        .tag-ins{color:var(--blue);background:rgba(61,122,181,.1)}
+        .tag-skill{color:var(--green);background:rgba(74,154,96,.1)}
+        .tag-mind{color:var(--purple);background:rgba(123,94,167,.1)}
+        .tag-job{color:var(--gold);background:rgba(201,152,46,.1)}
+        .tag-biz{color:var(--teal);background:rgba(46,158,143,.1)}
+        .tag-legal{color:#b06040;background:rgba(176,96,64,.1)}
+        .tag-career{color:#5078b0;background:rgba(80,120,176,.1)}
+
+        .resource-expand{margin-top:4rem}
+        .expand-tabs{display:flex;gap:.5rem;margin-bottom:2rem;flex-wrap:wrap}
+        .expand-tab{padding:.6rem 1.4rem;border:1.5px solid var(--border);border-radius:2rem;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .3s;background:transparent;color:var(--text-muted);font-family:inherit}
+        .expand-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+        .expand-tab:hover:not(.active){border-color:var(--accent);color:var(--accent)}
+        .expand-panel{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem;animation:fadePanel .4s ease}
+        .expand-panel.active{display:block}
+        @keyframes fadePanel{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .expand-panel h3{font-family:var(--font-serif);font-weight:700;font-size:1.3rem;margin-bottom:1rem}
+        .expand-panel h4{font-weight:600;font-size:.95rem;margin:1.5rem 0 .5rem;color:var(--accent)}
+        .expand-panel p,.expand-panel li{font-size:.92rem;color:var(--text-muted);line-height:1.9}
+        .expand-panel ul{padding-left:1.2rem;margin:.5rem 0}
+        .expand-panel li{margin-bottom:.3rem}
+        .info-box{background:var(--accent-pale);border-left:3px solid var(--accent);border-radius:0 .5rem .5rem 0;padding:1.2rem 1.5rem;margin:1.5rem 0;font-size:.88rem;color:var(--text-muted);line-height:1.8}
+        .info-box.gold{background:rgba(201,152,46,.08);border-left-color:var(--gold)}
+        .info-box.blue{background:rgba(61,122,181,.08);border-left-color:var(--blue)}
+
+        .assess-section{background:var(--bg-deep)}
+        .assess-container{max-width:800px;margin:0 auto}
+        .assess-progress{display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem}
+        .assess-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+        .assess-bar-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .5s ease}
+        .assess-step-text{font-size:.8rem;color:var(--text-muted);white-space:nowrap;min-width:50px;text-align:right}
+        .assess-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:3rem;text-align:center}
+        .assess-card h3{font-family:var(--font-serif);font-weight:700;font-size:1.4rem;margin-bottom:.6rem}
+        .assess-card p{color:var(--text-muted);font-size:.92rem;margin-bottom:2rem}
+        .assess-options{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem}
+        .assess-opt{padding:1.2rem 1rem;border:1.5px solid var(--border);border-radius:.7rem;cursor:pointer;transition:all .3s;background:var(--bg);text-align:center}
+        .assess-opt:hover{border-color:var(--accent);background:var(--accent-pale)}
+        .assess-opt.selected{border-color:var(--accent);background:var(--accent-pale);box-shadow:0 0 0 3px rgba(196,85,58,.1)}
+        .assess-opt .opt-icon{width:2rem;height:2rem;margin:0 auto .3rem;color:var(--accent)}
+        .assess-opt .opt-icon svg{width:100%;height:100%}
+        .assess-opt .opt-text{font-size:.88rem;font-weight:600}
+        .assess-opt .opt-desc{font-size:.75rem;color:var(--text-muted);margin-top:.2rem}
+        .assess-nav{display:flex;justify-content:center;gap:1rem}
+        .assess-result{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:3rem}
+        .assess-result.show{display:block;animation:fadePanel .5s ease}
+        .assess-result h3{font-family:var(--font-serif);font-weight:700;font-size:1.4rem;margin-bottom:1.5rem;text-align:center}
+        .skill-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:2rem}
+        .skill-result-item{padding:1.5rem;background:var(--bg);border-radius:.7rem;border:1px solid var(--border)}
+        .skill-result-item h4{font-size:.92rem;font-weight:600;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+        .skill-result-item h4 svg{width:1.1rem;height:1.1rem}
+        .skill-result-item p{font-size:.82rem;color:var(--text-muted);line-height:1.7}
+        .skill-meter{margin-top:.6rem;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+        .skill-meter-fill{height:100%;border-radius:2px;transition:width 1s ease}
+        .radar-wrap{display:flex;justify-content:center;margin:1.5rem 0 2rem}
+        .radar-svg{width:280px;height:280px}
+
+        .mental-section{background:linear-gradient(135deg,#2a1f2e 0%,#1a2530 100%);color:#f0ece4;position:relative}
+        .mental-section .section-label{color:var(--accent-soft)}
+        .mental-section .section-title{color:#f0ece4}
+        .mental-section .section-desc{color:rgba(240,236,228,.45)}
+        .mental-section .divider{background:var(--accent-soft);opacity:.4}
+        .mental-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+        .hotline-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:2rem;transition:all .3s}
+        .hotline-card:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15)}
+        .hotline-num{font-family:var(--font-serif);font-weight:900;font-size:1.8rem;color:var(--accent-soft);margin-bottom:.3rem;letter-spacing:.05em}
+        .hotline-name{font-weight:600;font-size:.95rem;margin-bottom:.3rem;color:rgba(240,236,228,.9)}
+        .hotline-desc{font-size:.82rem;color:rgba(240,236,228,.4);line-height:1.7}
+        .hotline-time{display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;color:rgba(240,236,228,.3);margin-top:.6rem}
+        .hotline-time::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+        .tips-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:2rem;margin-top:2rem}
+        .tips-box h4{font-family:var(--font-serif);font-weight:700;font-size:1.1rem;margin-bottom:1rem;color:var(--gold-soft)}
+        .tip-item{display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start}
+        .tip-num{width:1.8rem;height:1.8rem;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--accent-soft);flex-shrink:0}
+        .tip-text{font-size:.88rem;color:rgba(240,236,228,.6);line-height:1.7}
+
+        .stories-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:1.5rem}
+        .story-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2.2rem 1.8rem;transition:all .35s}
+        .story-card:hover{box-shadow:0 16px 48px var(--shadow);transform:translateY(-3px)}
+        .story-card:first-child{grid-row:span 2}
+        .story-quote{font-family:var(--font-serif);font-size:1rem;line-height:2;margin-bottom:1.5rem;color:var(--text);position:relative;padding-left:1rem;border-left:2px solid var(--gold-soft)}
+        .story-author{display:flex;align-items:center;gap:.8rem;padding-top:1.2rem;border-top:1px solid var(--border)}
+        .story-avatar{width:2.6rem;height:2.6rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0}
+        .av1{background:rgba(196,85,58,.12);color:var(--accent)}
+        .av2{background:rgba(201,152,46,.12);color:var(--gold)}
+        .av3{background:rgba(61,122,181,.12);color:var(--blue)}
+        .av4{background:rgba(74,154,96,.12);color:var(--green)}
+        .av5{background:rgba(123,94,167,.12);color:var(--purple)}
+        .story-name{font-weight:600;font-size:.88rem}
+        .story-role{font-size:.75rem;color:var(--text-light)}
+        .story-outcome{margin-top:1rem;padding:.8rem 1rem;background:rgba(74,154,96,.06);border-radius:.5rem;font-size:.82rem;color:var(--green);display:flex;align-items:center;gap:.4rem}
+        .story-outcome svg{width:1rem;height:1rem;stroke:var(--green)}
+
+        .quote-section{padding:5rem 0;background:var(--surface-alt);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+        .quote-inner{max-width:700px;margin:0 auto;text-align:center}
+        .quote-icon{font-size:2rem;color:var(--gold-soft);margin-bottom:1rem;font-family:serif}
+        .quote-text{font-family:var(--font-serif);font-size:1.4rem;font-weight:600;line-height:1.8;margin-bottom:1rem;color:var(--text);transition:opacity .3s ease}
+        .quote-author{font-size:.85rem;color:var(--text-muted);transition:opacity .3s ease}
+        .quote-dots{display:flex;justify-content:center;gap:.5rem;margin-top:1.5rem}
+        .quote-dot{width:8px;height:8px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .3s}
+        .quote-dot.active{background:var(--accent);transform:scale(1.3)}
+
+        .timeline-container{max-width:820px;margin:0 auto;position:relative}
+        .timeline-container::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--accent),var(--gold),var(--border));transform:translateX(-50%)}
+        .tl-item{display:flex;margin-bottom:2.5rem;position:relative}
+        .tl-item:nth-child(odd){padding-right:calc(50% + 2rem);text-align:right}
+        .tl-item:nth-child(even){padding-left:calc(50% + 2rem)}
+        .tl-dot{position:absolute;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;border:3px solid var(--bg-deep);z-index:2;box-shadow:0 0 0 3px rgba(196,85,58,.15)}
+        .tl-dot.dot-red{background:var(--accent)}.tl-dot.dot-gold{background:var(--gold)}.tl-dot.dot-blue{background:var(--blue)}.tl-dot.dot-green{background:var(--green)}.tl-dot.dot-accent{background:var(--accent-soft)}
+        .tl-content{background:var(--surface);border:1px solid var(--border);border-radius:.8rem;padding:1.5rem;width:100%;transition:all .3s}
+        .tl-content:hover{box-shadow:0 8px 30px var(--shadow);transform:translateY(-2px)}
+        .tl-step{font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+        .tl-content h4{font-family:var(--font-serif);font-weight:700;font-size:1.05rem;margin-bottom:.3rem}
+        .tl-content p{font-size:.85rem;color:var(--text-muted);line-height:1.8}
+        .tl-checklist{list-style:none;padding:0;margin-top:.6rem}
+        .tl-checklist li{font-size:.82rem;color:var(--text-muted);padding:.2rem 0;padding-left:1.2rem;position:relative;text-align:left;transition:all .2s;cursor:pointer}
+        .tl-checklist li::before{content:'\25A1';position:absolute;left:0;color:var(--accent);transition:all .2s}
+        .tl-checklist li.checked{text-decoration:line-through;opacity:.5}
+        .tl-checklist li.checked::before{content:'\2713';color:var(--green)}
+
+        .calc-section{background:var(--bg-deep)}
+        .calc-container{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+        .calc-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem}
+        .calc-form h3{font-family:var(--font-serif);font-weight:700;font-size:1.3rem;margin-bottom:1.5rem}
+        .form-group{margin-bottom:1.5rem}
+        .form-label{display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:.4rem;letter-spacing:.03em}
+        .form-input{width:100%;padding:.8rem 1rem;border:1.5px solid var(--border);border-radius:.5rem;font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);transition:border-color .3s}
+        .form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,85,58,.08)}
+        .form-hint{font-size:.72rem;color:var(--text-light);margin-top:.3rem}
+        .calc-result{background:var(--text);color:#f0ece4;border-radius:var(--radius);padding:2.5rem;position:sticky;top:6rem}
+        .calc-result h3{font-family:var(--font-serif);font-weight:700;font-size:1.2rem;margin-bottom:1.5rem}
+        .result-row{display:flex;justify-content:space-between;align-items:center;padding:.8rem 0;border-bottom:1px solid rgba(255,255,255,.06)}
+        .result-row:last-child{border-bottom:none}
+        .result-label{font-size:.88rem;color:rgba(240,236,228,.5)}
+        .result-value{font-family:var(--font-serif);font-weight:700;font-size:1.1rem}
+        .result-value.danger{color:var(--accent-soft)}.result-value.safe{color:#80d090}
+        .result-total{margin-top:1rem;padding-top:1rem;border-top:2px solid rgba(255,255,255,.1)}
+        .result-total .result-value{font-size:1.4rem}
+        .result-bar{margin-top:1.5rem}
+        .bar-track{height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden}
+        .bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
+        .bar-labels{display:flex;justify-content:space-between;margin-top:.4rem;font-size:.7rem;color:rgba(240,236,228,.3)}
+
+        .faq-list{max-width:780px;margin:0 auto}
+        .faq-item{border-bottom:1px solid var(--border)}
+        .faq-q{width:100%;display:flex;justify-content:space-between;align-items:center;padding:1.4rem 0;background:none;border:none;cursor:pointer;font-family:inherit;font-size:1rem;font-weight:600;color:var(--text);text-align:left;transition:color .3s;gap:1rem}
+        .faq-q:hover{color:var(--accent)}
+        .faq-arrow{font-size:1.2rem;transition:transform .3s;color:var(--text-light);flex-shrink:0}
+        .faq-item.open .faq-arrow{transform:rotate(180deg);color:var(--accent)}
+        .faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease}
+        .faq-item.open .faq-a{max-height:500px}
+        .faq-a-inner{padding-bottom:1.2rem;font-size:.92rem;color:var(--text-muted);line-height:1.9}
+
+        .community-section{background:var(--bg-deep)}
+        .community-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem}
+        .community-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .35s}
+        .community-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px var(--shadow)}
+        .cc-img{height:160px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+        .cc-img svg{width:3rem;height:3rem;opacity:.5}
+        .cc-img.cc1{background:linear-gradient(135deg,rgba(196,85,58,.12),rgba(201,152,46,.08));color:var(--accent)}
+        .cc-img.cc2{background:linear-gradient(135deg,rgba(61,122,181,.12),rgba(46,158,143,.08));color:var(--blue)}
+        .cc-img.cc3{background:linear-gradient(135deg,rgba(123,94,167,.12),rgba(196,85,58,.08));color:var(--purple)}
+        .cc-body{padding:1.5rem}
+        .cc-body h4{font-family:var(--font-serif);font-weight:700;font-size:1.1rem;margin-bottom:.5rem}
+        .cc-body p{font-size:.85rem;color:var(--text-muted);line-height:1.8;margin-bottom:1rem}
+        .cc-meta{display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--text-light)}
+        .cc-tag{padding:.2rem .6rem;background:var(--accent-pale);color:var(--accent);border-radius:.3rem;font-weight:600;font-size:.7rem}
+
+        .cta-section{text-align:center;position:relative;padding:8rem 0;overflow:hidden}
+        .cta-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(196,85,58,.05),transparent 70%);pointer-events:none}
+        .cta-section .section-title{max-width:550px;margin:0 auto 1rem}
+        .cta-section .section-desc{max-width:500px;margin:0 auto 2.5rem;text-align:center}
+        .cta-actions{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+        .cta-hint{margin-top:1.8rem;font-size:.82rem;color:var(--text-light)}
+        .cta-hint strong{color:var(--accent)}
+
+        .newsletter{background:var(--surface-alt);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4rem 0}
+        .newsletter-inner{display:flex;align-items:center;justify-content:space-between;gap:3rem}
+        .newsletter-text h3{font-family:var(--font-serif);font-weight:700;font-size:1.3rem;margin-bottom:.4rem}
+        .newsletter-text p{font-size:.88rem;color:var(--text-muted)}
+        .newsletter-form{display:flex;gap:.5rem;flex-shrink:0}
+        .newsletter-form input{padding:.8rem 1.2rem;border:1.5px solid var(--border);border-radius:.5rem;font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);width:260px;transition:border-color .3s}
+        .newsletter-form input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,85,58,.08)}
+
+        footer{background:var(--text);color:rgba(240,236,228,.4);padding:5rem 0 2rem}
+        .footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+        .footer-brand .logo{margin-bottom:1rem;display:inline-flex}
+        .footer-brand .logo small{color:rgba(240,236,228,.3)}
+        .footer-brand p{font-size:.85rem;line-height:1.8;max-width:280px}
+        .footer-col h5{color:rgba(240,236,228,.7);font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1rem}
+        .footer-col a{display:block;color:rgba(240,236,228,.4);text-decoration:none;font-size:.85rem;margin-bottom:.5rem;transition:color .3s}
+        .footer-col a:hover{color:var(--accent-soft)}
+        .footer-emergency{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:.7rem;padding:1.2rem 1.5rem;margin-top:.5rem}
+        .footer-emergency h6{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(240,236,228,.5);margin-bottom:.5rem}
+        .footer-emergency a{display:inline;margin-right:1.2rem;color:var(--accent-soft);font-weight:600;font-size:.85rem}
+        .footer-bottom{padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;font-size:.75rem;flex-wrap:wrap;gap:1rem}
+        .footer-legal{display:flex;gap:1.5rem}
+        .footer-legal a{color:rgba(240,236,228,.3);text-decoration:none;transition:color .3s}
+        .footer-legal a:hover{color:rgba(240,236,228,.6)}
+
+        .floating-help{position:fixed;bottom:2rem;left:2rem;z-index:50;display:flex;flex-direction:column;gap:.6rem;align-items:flex-start}
+        .floating-btn{display:flex;align-items:center;gap:.6rem;padding:.7rem 1.2rem;border-radius:2rem;font-size:.82rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.12);text-decoration:none}
+        .floating-btn svg{width:14px;height:14px}
+        .floating-btn.hotline-btn{background:var(--accent);color:#fff}
+        .floating-btn.hotline-btn:hover{background:#a94430;transform:translateX(4px)}
+        .floating-btn.chat-btn{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+        .floating-btn.chat-btn:hover{border-color:var(--accent);transform:translateX(4px)}
+        .back-top{position:fixed;bottom:2rem;right:2rem;width:44px;height:44px;border-radius:50%;background:var(--text);color:#f0ece4;display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;opacity:0;transform:translateY(10px);transition:all .3s;z-index:50;border:none;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+        .back-top.show{opacity:1;transform:translateY(0)}
+        .back-top:hover{background:var(--accent)}
+
+        @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+        [data-tip]{position:relative;cursor:help}
+        [data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--text);color:#f0ece4;font-size:.72rem;padding:.4rem .8rem;border-radius:.4rem;white-space:nowrap;opacity:0;pointer-events:none;transition:all .2s ease;z-index:50}
+        [data-tip]:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+
+        @media(max-width:1024px){
+            .hero-inner{grid-template-columns:1fr;gap:3rem}
+            .hero h1{font-size:2.8rem}
+            .problem-grid{grid-template-columns:1fr 1fr}
+            .resource-grid{grid-template-columns:1fr}
+            .stories-grid{grid-template-columns:1fr}
+            .story-card:first-child{grid-row:span 1}
+            .calc-container{grid-template-columns:1fr}
+            .reality-grid{grid-template-columns:1fr 1fr}
+            .mental-grid{grid-template-columns:1fr}
+            .community-grid{grid-template-columns:1fr 1fr}
+            .footer-grid{grid-template-columns:1fr 1fr 1fr}
+            .newsletter-inner{flex-direction:column;text-align:center}
+            .trends-grid{grid-template-columns:1fr}
+            .skill-result-grid{grid-template-columns:1fr 1fr}
+        }
+        @media(max-width:768px){
+            .hero{padding:6rem 0 4rem}
+            .hero-inner{padding:6rem 0 4rem}
+            .hero h1{font-size:2.1rem}
+            section{padding:5rem 0}
+            .section-title{font-size:2rem}
+            .container{padding:0 1.2rem}
+            nav{padding:1rem 1.2rem}
+            .nav-links{display:none;position:fixed;top:0;right:0;width:280px;height:100vh;background:var(--surface);flex-direction:column;padding:5rem 2rem 2rem;gap:1.5rem;box-shadow:-10px 0 40px rgba(0,0,0,.1);z-index:150;transform:translateX(100%);transition:transform .3s ease}
+            .nav-links.show{display:flex;transform:translateX(0)}
+            .nav-mobile{display:block}
+            .problem-grid,.reality-grid,.community-grid{grid-template-columns:1fr}
+            .footer-grid{grid-template-columns:1fr 1fr}
+            .stat-grid{grid-template-columns:1fr 1fr}
+            .timeline-container::before{left:6px}
+            .tl-dot{left:6px!important}
+            .tl-item:nth-child(odd),.tl-item:nth-child(even){padding-left:2.5rem;padding-right:0;text-align:left}
+            .hero-actions{flex-direction:column;align-items:flex-start}
+            .newsletter-form{flex-direction:column;width:100%}
+            .newsletter-form input{width:100%}
+            .floating-help{bottom:5rem;left:1rem}
+            .assess-options{grid-template-columns:1fr}
+            .skill-result-grid{grid-template-columns:1fr}
+        }
+
+        /* ═══════ PERSONAL TOOLKIT ═══════ */
+        .toolkit-section{background:var(--bg)}
+        .toolkit-tabs{display:flex;gap:.4rem;margin-bottom:1.5rem;flex-wrap:wrap;justify-content:center}
+        .toolkit-tab{padding:.55rem 1.2rem;border:1.5px solid var(--border);border-radius:2rem;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .3s;background:transparent;color:var(--text-muted);font-family:inherit;display:flex;align-items:center;gap:.4rem}
+        .toolkit-tab svg{width:16px;height:16px}
+        .toolkit-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+        .toolkit-tab:hover:not(.active){border-color:var(--accent);color:var(--accent)}
+        .toolkit-panel{display:none;animation:fadePanel .4s ease}
+        .toolkit-panel.active{display:block}
+        .toolkit-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem}
+        .tk-stat{text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:.6rem;padding:.8rem .4rem}
+        .tk-stat-num{font-family:var(--font-serif);font-weight:900;font-size:1.5rem;line-height:1}
+        .tk-stat-label{font-size:.68rem;color:var(--text-muted);margin-top:.2rem}
+        .tk-stat.s1 .tk-stat-num{color:var(--blue)}.tk-stat.s2 .tk-stat-num{color:var(--accent)}.tk-stat.s3 .tk-stat-num{color:var(--green)}.tk-stat.s4 .tk-stat-num{color:var(--red)}
+        .tk-filter{display:flex;gap:.4rem;margin-bottom:.8rem;flex-wrap:wrap}
+        .tk-chip{padding:.3rem .8rem;border-radius:1rem;font-size:.75rem;background:var(--gray-light,#F3F4F6);color:var(--text-muted);cursor:pointer;font-family:inherit;border:none;transition:all .2s}
+        .tk-chip.active{background:var(--accent);color:#fff}
+        .tk-card{background:var(--surface);border:1px solid var(--border);border-radius:.7rem;padding:.9rem;margin-bottom:.6rem;transition:all .25s}
+        .tk-card:hover{border-color:var(--accent);box-shadow:0 4px 16px var(--shadow)}
+        .tk-card-head{display:flex;justify-content:space-between;align-items:start;margin-bottom:.4rem}
+        .tk-card-title{font-weight:700;font-size:.92rem}
+        .tk-card-sub{font-size:.78rem;color:var(--text-muted)}
+        .tk-badge{padding:.15rem .5rem;border-radius:.3rem;font-size:.68rem;font-weight:600;white-space:nowrap}
+        .tk-badge.b-blue{background:rgba(61,122,181,.12);color:var(--blue)}
+        .tk-badge.b-gold{background:rgba(201,152,46,.12);color:var(--gold)}
+        .tk-badge.b-green{background:rgba(74,154,96,.12);color:var(--green)}
+        .tk-badge.b-red{background:rgba(196,85,58,.12);color:var(--accent)}
+        .tk-badge.b-gray{background:var(--gray-light,#F3F4F6);color:var(--text-muted)}
+        .tk-card-meta{display:flex;gap:.8rem;font-size:.72rem;color:var(--text-muted);margin-top:.3rem;flex-wrap:wrap}
+        .tk-card-note{margin-top:.3rem;padding:.3rem .6rem;background:var(--bg);border-radius:.4rem;font-size:.78rem;color:var(--text-muted)}
+        .tk-card-actions{display:flex;gap:.4rem;margin-top:.5rem}
+        .tk-btn-sm{padding:.25rem .6rem;border-radius:.4rem;font-size:.72rem;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all .2s}
+        .tk-btn-edit{background:rgba(61,122,181,.1);color:var(--blue)}
+        .tk-btn-del{background:rgba(196,85,58,.1);color:var(--accent)}
+        .tk-btn-add{background:var(--accent);color:#fff;padding:.5rem 1rem;border-radius:.5rem;font-size:.85rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;display:inline-flex;align-items:center;gap:.3rem;transition:all .2s}
+        .tk-btn-add:hover{background:var(--accent-dark,#a94430)}
+        .tk-btn-add svg{width:16px;height:16px}
+        .tk-empty{text-align:center;padding:2rem 1rem;color:var(--text-muted);font-size:.88rem}
+        .tk-empty svg{width:48px;height:48px;opacity:.2;margin-bottom:.5rem}
+        .tk-mood-row{display:flex;justify-content:space-around;gap:.3rem;margin-bottom:.8rem}
+        .tk-mood{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.4rem;border-radius:.5rem;cursor:pointer;transition:all .2s;min-width:44px}
+        .tk-mood svg{width:28px;height:28px}
+        .tk-mood-label{font-size:.68rem;color:var(--text-muted)}
+        .tk-mood.selected{background:rgba(201,152,46,.12)}
+        .tk-mood.selected .tk-mood-label{color:var(--gold);font-weight:600}
+        .tk-input{width:100%;padding:.5rem .8rem;border:1.5px solid var(--border);border-radius:.5rem;font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);transition:border-color .3s}
+        .tk-input:focus{outline:none;border-color:var(--accent)}
+        .tk-checkin-btn{width:100%;margin-top:.5rem;padding:.5rem;background:var(--accent);color:#fff;border-radius:.5rem;font-size:.88rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .2s}
+        .tk-checkin-btn:hover{background:var(--accent-dark,#a94430)}
+        .tk-checkin-btn.done{background:var(--green)}
+        .tk-day-counter{text-align:center;padding:1.5rem;background:linear-gradient(135deg,var(--accent-pale),rgba(201,152,46,.06));border-radius:.7rem;margin-bottom:1rem}
+        .tk-day-num{font-family:var(--font-serif);font-weight:900;font-size:2.5rem;color:var(--accent);line-height:1}
+        .tk-day-label{font-size:.82rem;color:var(--text-muted);margin-top:.2rem}
+        .tk-finance-summary{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem}
+        .tk-fin-card{text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:.6rem;padding:.8rem}
+        .tk-fin-num{font-family:var(--font-serif);font-weight:700;font-size:1.2rem}
+        .tk-fin-num.expense{color:var(--accent)}.tk-fin-num.income{color:var(--green)}
+        .tk-fin-label{font-size:.72rem;color:var(--text-muted)}
+        .tk-txn-item{display:flex;align-items:center;gap:.5rem;padding:.5rem 0;border-bottom:1px solid var(--border)}
+        .tk-txn-cat{width:32px;height:32px;border-radius:.4rem;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+        .tk-txn-info{flex:1;min-width:0}
+        .tk-txn-name{font-size:.82rem;font-weight:500}
+        .tk-txn-date{font-size:.7rem;color:var(--text-muted)}
+        .tk-txn-amt{font-weight:700;font-size:.88rem;flex-shrink:0}
+        .tk-txn-amt.expense{color:var(--accent)}.tk-txn-amt.income{color:var(--green)}
+        .tk-skill-progress{height:6px;background:var(--gray-light,#F3F4F6);border-radius:3px;margin:.4rem 0;overflow:hidden}
+        .tk-skill-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .5s}
+        .tk-skill-text{display:flex;justify-content:space-between;font-size:.72rem;color:var(--text-muted)}
+        .tk-heat{display:flex;gap:2px;margin-top:.4rem;flex-wrap:wrap}
+        .tk-heat-cell{width:16px;height:16px;border-radius:2px;background:var(--gray-light,#F3F4F6)}
+        .tk-heat-cell.l1{background:rgba(201,152,46,.3)}.tk-heat-cell.l2{background:rgba(201,152,46,.5)}.tk-heat-cell.l3{background:rgba(201,152,46,.7)}.tk-heat-cell.l4{background:var(--gold)}
+
+        /* Toolkit Modal */
+        .tk-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;padding:20px;align-items:flex-end;justify-content:center}
+        .tk-modal-overlay.show{display:flex}
+        .tk-modal{background:#fff;border-radius:16px 16px 0 0;padding:20px;max-width:480px;width:100%;max-height:85vh;overflow-y:auto}
+        .tk-modal-title{font-size:17px;font-weight:700;margin-bottom:14px;text-align:center;color:var(--text)}
+        .tk-form-group{margin-bottom:10px}
+        .tk-form-label{display:block;font-size:.78rem;color:var(--text-muted);margin-bottom:.2rem;font-weight:500}
+        .tk-form-input,.tk-form-select,.tk-form-textarea{width:100%;padding:.5rem .8rem;border:1.5px solid var(--border);border-radius:.5rem;font-size:16px;font-family:inherit;background:#fff;color:var(--text)}
+        .tk-form-input:focus,.tk-form-select:focus,.tk-form-textarea:focus{outline:none;border-color:var(--accent)}
+        .tk-form-row{display:flex;gap:.5rem}
+        .tk-form-row .tk-form-group{flex:1}
+        .tk-modal-actions{display:flex;gap:.5rem;margin-top:14px}
+        .tk-btn-cancel{flex:1;padding:.5rem;border-radius:.5rem;background:var(--gray-light,#F3F4F6);color:var(--text-muted);font-size:.88rem;font-weight:600;cursor:pointer;border:none;font-family:inherit}
+        .tk-btn-save{flex:1;padding:.5rem;border-radius:.5rem;background:var(--accent);color:#fff;font-size:.88rem;font-weight:600;cursor:pointer;border:none;font-family:inherit}
+        .tk-confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;padding:20px;align-items:center;justify-content:center}
+        .tk-confirm-overlay.show{display:flex}
+        .tk-confirm-box{background:#fff;border-radius:16px;padding:24px;max-width:320px;width:100%;text-align:center}
+        .tk-confirm-title{font-size:15px;font-weight:600;margin-bottom:6px;color:var(--text)}
+        .tk-confirm-text{font-size:.82rem;color:var(--text-muted);margin-bottom:14px}
+        .tk-confirm-actions{display:flex;gap:.5rem}
+        .tk-confirm-actions button{flex:1;padding:.5rem;border-radius:.5rem;font-size:.88rem;font-weight:600;cursor:pointer;border:none;font-family:inherit}
+        .tk-btn-no{background:var(--gray-light,#F3F4F6);color:var(--text-muted)}
+        .tk-btn-yes{background:var(--accent);color:#fff}
+
+        @media(max-width:768px){
+            .toolkit-stats{grid-template-columns:1fr 1fr}
+            .tk-finance-summary{grid-template-columns:1fr}
+        }
+
+        /* ═══════ AUTH MODAL ═══════ */
+        .auth-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;padding:20px;align-items:center;justify-content:center}
+        .auth-overlay.show{display:flex}
+        .auth-box{background:#fff;border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+        .auth-title{font-family:var(--font-serif);font-weight:900;font-size:1.4rem;color:var(--text);text-align:center;margin-bottom:.4rem}
+        .auth-sub{font-size:.82rem;color:var(--text-muted);text-align:center;margin-bottom:1.5rem}
+        .auth-tabs{display:flex;gap:0;margin-bottom:1.5rem;background:var(--bg-deep);border-radius:.5rem;padding:.2rem}
+        .auth-tab{flex:1;padding:.5rem;text-align:center;font-size:.85rem;font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--text-muted);border-radius:.4rem;transition:all .2s}
+        .auth-tab.active{background:#fff;color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+        .auth-form{display:none}
+        .auth-form.active{display:block}
+        .auth-input{width:100%;padding:.7rem .9rem;border:1.5px solid var(--border);border-radius:.5rem;font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);margin-bottom:.8rem;transition:border-color .3s}
+        .auth-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,85,58,.08)}
+        .auth-btn{width:100%;padding:.7rem;background:var(--accent);color:#fff;border:none;border-radius:.5rem;font-size:.95rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:.3rem}
+        .auth-btn:hover{background:var(--accent-dark,#a94430)}
+        .auth-btn:disabled{opacity:.5;cursor:not-allowed}
+        .auth-error{color:var(--accent);font-size:.8rem;text-align:center;margin-top:.6rem;min-height:1.2rem;display:none}
+        .auth-error.show{display:block}
+        .auth-close{position:absolute;top:1rem;right:1rem;width:28px;height:28px;border:none;background:none;font-size:1.2rem;color:var(--text-muted);cursor:pointer;line-height:1}
+        .auth-box{position:relative}
+
+        /* ═══════ AUTH NAV BUTTON ═══════ */
+        .nav-auth{display:flex;align-items:center;gap:.5rem}
+        .nav-user{font-size:.82rem;color:var(--text-muted);display:none}
+        .nav-user.show{display:flex;align-items:center;gap:.4rem}
+        .nav-user-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700}
+        .nav-logout{font-size:.78rem;color:var(--text-light);cursor:pointer;border:none;background:none;font-family:inherit;transition:color .2s}
+        .nav-logout:hover{color:var(--accent)}
+        .nav-login-btn{padding:.4rem 1rem;background:var(--accent);color:#fff;border:none;border-radius:.4rem;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+        .nav-login-btn:hover{background:var(--accent-dark,#a94430)}
+
+        /* ═══════ TOOLKIT LOGIN GATE ═══════ */
+        .tk-gate{display:none;text-align:center;padding:3rem 1rem}
+        .tk-gate.show{display:block}
+        .tk-gate svg{width:56px;height:56px;opacity:.15;margin-bottom:.8rem}
+        .tk-gate h3{font-family:var(--font-serif);font-weight:700;font-size:1.2rem;color:var(--text);margin-bottom:.4rem}
+        .tk-gate p{font-size:.88rem;color:var(--text-muted);margin-bottom:1.2rem}
+        .tk-gate-btn{padding:.6rem 1.5rem;background:var(--accent);color:#fff;border:none;border-radius:.5rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+        .tk-gate-btn:hover{background:var(--accent-dark,#a94430)}
+        .tk-content{display:none}
+        .tk-content.show{display:block}
+        .tk-loading{text-align:center;padding:2rem;color:var(--text-muted);font-size:.85rem}
+    </style>
+</head>
+<body>
+
+<!-- SVG ICON DEFS -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></symbol>
+<symbol id="i-brain" viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+<symbol id="i-handshake" viewBox="0 0 24 24"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></symbol>
+<symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="7" width="16" height="10" rx="2"/><line x1="22" y1="11" x2="22" y2="13"/><rect x="4" y="9" width="10" height="6" rx="1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-robot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 2v4"/><circle cx="9" cy="14" r="1" fill="currentColor"/><circle cx="15" cy="14" r="1" fill="currentColor"/><path d="M2 14h2M20 14h2"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+<symbol id="i-package" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
+<symbol id="i-wheat" viewBox="0 0 24 24"><path d="M2 22 16 8"/><path d="M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z"/><path d="M7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z"/><path d="M11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z"/></symbol>
+<symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></symbol>
+<symbol id="i-lightbulb" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></symbol>
+<symbol id="i-speech" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></symbol>
+<symbol id="i-palette" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+<symbol id="i-rocket" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+<symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+<symbol id="i-store" viewBox="0 0 24 24"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></symbol>
+<symbol id="i-microscope" viewBox="0 0 24 24"><path d="M6 18h8a4 4 0 0 0 4-4 4 4 0 0 0-4-4h-3a7 7 0 0 0-7 7"/><path d="M6 21h12"/><path d="M9 6h6"/><path d="M9 6v6"/><path d="m12 3 3 3-3 3"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+<symbol id="i-books" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+<symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+<symbol id="i-phone-call" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+<symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-arrow-up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
+<symbol id="i-construction" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></symbol>
+<symbol id="i-gavel" viewBox="0 0 24 24"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+<symbol id="i-fire" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+</defs>
+</svg>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+    <a href="#" class="logo">重启<small>RESTART</small></a>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="#problems" onclick="closeNav()">困境</a></li>
+        <li><a href="#trends" onclick="closeNav()">趋势</a></li>
+        <li><a href="#resources" onclick="closeNav()">资源</a></li>
+        <li><a href="#toolkit" onclick="closeNav()">工具</a></li>
+        <li><a href="#assess" onclick="closeNav()">自测</a></li>
+        <li><a href="#mental" onclick="closeNav()">心理</a></li>
+        <li><a href="#stories" onclick="closeNav()">故事</a></li>
+        <li><a href="#plan" onclick="closeNav()">规划</a></li>
+        <li><a href="#faq" onclick="closeNav()">问答</a></li>
+        <li><a href="#cta" class="nav-cta" onclick="closeNav()">加入互助</a></li>
+    </ul>
+    <div class="nav-right">
+        <div class="nav-auth" id="navAuth">
+            <button class="nav-login-btn" id="navLoginBtn" onclick="openAuth()">登录</button>
+            <div class="nav-user" id="navUserInfo" style="display:none">
+                <div class="nav-user-avatar" id="navUserAvatar">U</div>
+                <span id="navUserNickname" style="font-size:.82rem;color:var(--text-muted)">用户</span>
+                <button class="nav-logout" onclick="logout()">退出</button>
+            </div>
+        </div>
+        <button class="nav-mobile" id="navMobile" aria-label="菜单"><span></span><span></span><span></span></button>
+    </div>
+</nav>
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-bg">
+        <div class="deco-circle dc1"></div>
+        <div class="deco-circle dc2"></div>
+        <div class="deco-circle dc3"></div>
+    </div>
+    <div class="container">
+        <div class="hero-inner">
+            <div class="hero-left">
+                <div class="hero-tag" style="animation:slideUp .8s ease .3s both"><span class="pulse-dot"></span> 你不是一个人在战斗</div>
+                <h1 style="animation:slideUp .8s ease .5s both">暂停，不是终点<br>是<em>重新出发</em>的起点</h1>
+                <p class="hero-desc" style="animation:slideUp .8s ease .7s both">
+                    在中国，每年有数百万劳动者经历失业或职业中断。这里有真实的数据、实用的工具、温暖的社区，帮助你走过这段不确定的路，找到属于自己的新方向。
+                </p>
+                <div class="hero-actions" style="animation:slideUp .8s ease .9s both">
+                    <a href="#resources" class="btn btn-primary">浏览资源 <svg class="ico"><use href="#i-arrow-right"/></svg></a>
+                    <a href="#stories" class="btn btn-outline">听听他们的故事</a>
+                </div>
+                <div class="hero-note" style="animation:slideUp .8s ease 1.1s both">
+                    <svg class="ico" style="width:14px;height:14px"><use href="#i-shield"/></svg>
+                    公益平台，所有信息免费公开，无需注册即可浏览
+                </div>
+                <div class="hero-trust" style="animation:slideUp .8s ease 1.3s both">
+                    <div class="hero-trust-label">数据来源</div>
+                    <div class="hero-trust-logos">
+                        <a href="https://www.stats.gov.cn/" target="_blank" rel="noopener">国家统计局</a>
+                        <a href="https://www.mohrss.gov.cn/" target="_blank" rel="noopener">人社部</a>
+                        <a href="https://www.acftu.org/" target="_blank" rel="noopener">全国总工会</a>
+                        <a href="http://www.chinajob.gov.cn/" target="_blank" rel="noopener">中国就业网</a>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-num red" data-count="570" data-suffix="万+">0</div>
+                        <div class="stat-label">城镇登记失业人数</div>
+                        <div class="stat-sub">2024年 · <a href="https://www.stats.gov.cn/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">国家统计局</a>（年均值）</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num gold" data-count="16.1" data-suffix="%" data-decimal="1">0</div>
+                        <div class="stat-label">16-24岁青年失业率</div>
+                        <div class="stat-sub">不含在校生口径 · 2024年均值</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num blue" data-count="3" data-suffix="-6月">0</div>
+                        <div class="stat-label">平均求职周期</div>
+                        <div class="stat-sub">因行业和地域而异</div>
+                    </div>
+                    <div class="stat-card ring-card">
+                        <div class="ring-chart">
+                            <svg class="ring-svg" viewBox="0 0 100 100">
+                                <circle class="ring-track" cx="50" cy="50" r="46"/>
+                                <circle class="ring-fill-arc" cx="50" cy="50" r="46" id="ringFillArc"/>
+                            </svg>
+                            <div class="ring-value">
+                                <span class="ring-num-val" data-count="72" data-suffix="">0</span><span class="ring-pct-val">%</span>
+                            </div>
+                        </div>
+                        <div class="stat-label">再就业者经历降薪</div>
+                        <div class="stat-sub">约72%降薪入职 · 智联招聘 2024</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-bar">
+    <div class="marquee-track">
+        <div class="marquee-item"><span>●</span>失业保险金可在线申领</div>
+        <div class="marquee-item"><span>●</span>免费技能培训覆盖50+城市</div>
+        <div class="marquee-item"><span>●</span>24小时心理援助热线：400-161-9995</div>
+        <div class="marquee-item"><span>●</span>2024年灵活就业政策已更新</div>
+        <div class="marquee-item"><span>●</span>全国社保转移接续可网上办理</div>
+        <div class="marquee-item"><span>●</span>创业担保贷款最高20万（部分地区30万）</div>
+        <div class="marquee-item"><span>●</span>高校毕业生就业见习补贴政策</div>
+        <div class="marquee-item"><span>●</span>社区公益性岗位持续招募</div>
+        <div class="marquee-item"><span>●</span>失业保险金可在线申领</div>
+        <div class="marquee-item"><span>●</span>免费技能培训覆盖50+城市</div>
+        <div class="marquee-item"><span>●</span>24小时心理援助热线：400-161-9995</div>
+        <div class="marquee-item"><span>●</span>2024年灵活就业政策已更新</div>
+        <div class="marquee-item"><span>●</span>全国社保转移接续可网上办理</div>
+        <div class="marquee-item"><span>●</span>创业担保贷款最高20万（部分地区30万）</div>
+        <div class="marquee-item"><span>●</span>高校毕业生就业见习补贴政策</div>
+        <div class="marquee-item"><span>●</span>社区公益性岗位持续招募</div>
+    </div>
+</div>
+
+<!-- PROBLEMS -->
+<section class="problems" id="problems">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">真实困境</div>
+            <h2 class="section-title">失业后的六座大山</h2>
+            <div class="divider"></div>
+            <p class="section-desc">失业不只是失去一份收入。它影响着生活的方方面面。正视这些困境，是走出困境的第一步。</p>
+        </div>
+        <div class="problem-grid">
+            <div class="problem-card reveal"><div class="problem-icon pi-red"><svg class="ico"><use href="#i-wallet"/></svg></div><h3>经济压力骤增</h3><p>房贷、车贷、子女教育、日常开销不会因为失业而按下暂停键。储蓄日渐减少，焦虑与日俱增。一线城市月均生活成本约8000-15000元，没有收入的日子远比想象中紧迫。</p></div>
+            <div class="problem-card reveal reveal-d1"><div class="problem-icon pi-gold"><svg class="ico"><use href="#i-brain"/></svg></div><h3>心理健康告急</h3><p>自我怀疑、焦虑、抑郁是失业者最常见的心理状态。据WHO及国内多项心理健康调查估算，失业超过6个月的人群中，约40%会出现不同程度的焦虑或抑郁症状。</p></div>
+            <div class="problem-card reveal reveal-d2"><div class="problem-icon pi-blue"><svg class="ico"><use href="#i-users"/></svg></div><h3>家庭关系承压</h3><p>经济压力往往转化为家庭矛盾。面对伴侣的担忧、父母的追问、孩子的需求，失业者常常选择独自承受，导致沟通减少、误解增加。</p></div>
+            <div class="problem-card reveal reveal-d3"><div class="problem-icon pi-green"><svg class="ico"><use href="#i-phone"/></svg></div><h3>求职碰壁循环</h3><p>已读不回的简历、漫长的面试流程、"35岁门槛"的隐性歧视、对职业空窗期的质疑……每一次被拒绝都在消磨信心。</p></div>
+            <div class="problem-card reveal reveal-d4"><div class="problem-icon pi-purple"><svg class="ico"><use href="#i-shield"/></svg></div><h3>社保断缴危机</h3><p>失去工作意味着社保断缴。医保断缴次月起无法报销，养老保险累计年限中断影响退休金。看病不敢去、体检不敢做。</p></div>
+            <div class="problem-card reveal reveal-d5"><div class="problem-icon pi-teal"><svg class="ico"><use href="#i-handshake"/></svg></div><h3>社交圈层萎缩</h3><p>不敢参加聚会、回避"你最近在干嘛"的问题、朋友圈互动减少。失业者常常选择自我隔离，逐渐失去最重要的社会支持网络。</p></div>
+        </div>
+    </div>
+</section>
+
+<div class="wave-divider" style="background:var(--bg-deep)">
+    <svg viewBox="0 0 1440 50" preserveAspectRatio="none"><path d="M0,0 C480,50 960,50 1440,0 L1440,50 L0,50 Z" fill="var(--text)"/></svg>
+</div>
+
+<!-- REALITY -->
+<section class="reality-section">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">数据透视</div>
+            <h2 class="section-title">就业市场的真实面貌</h2>
+            <div class="divider"></div>
+            <p class="section-desc">了解大环境，才能更好定位自己。数据来源：<a href="https://www.stats.gov.cn/" target="_blank" rel="noopener" style="color:var(--gold-soft)">国家统计局</a> · <a href="https://www.mohrss.gov.cn/" target="_blank" rel="noopener" style="color:var(--gold-soft)">人社部</a> · <a href="https://www.moe.gov.cn/" target="_blank" rel="noopener" style="color:var(--gold-soft)">教育部</a></p>
+        </div>
+        <div class="reality-grid">
+            <div class="reality-card reveal"><div class="big-num c1">2.17亿</div><h4>灵活就业人口规模</h4><p>灵活就业人口已达2.17亿，占总就业人口约27%。自由职业、平台就业、远程工作等新形态正在成为就业市场的重要力量。<br><small style="color:rgba(240,236,228,.3)">来源：人社部 · 2024年数据</small></p></div>
+            <div class="reality-card reveal reveal-d1"><div class="big-num c2">1222万</div><h4>2025届高校毕业生</h4><p>2025届毕业生数量再创新高，较2024届（1179万）增加43万。新兴产业和服务业创造了大量新岗位，但结构性矛盾仍然突出。<br><small style="color:rgba(240,236,228,.3)">来源：教育部 · 2024年公布</small></p></div>
+            <div class="reality-card reveal reveal-d2"><div class="big-num c3">48.1%</div><h4>第三产业就业占比</h4><p>服务业已成为吸纳就业的第一大产业，占比持续上升。数字经济、新能源、养老健康、现代物流等领域持续释放新的就业机会。<br><small style="color:rgba(240,236,228,.3)">来源：国家统计局 · 2023年</small></p></div>
+        </div>
+    </div>
+</section>
+
+<div class="wave-divider" style="background:var(--text)">
+    <svg viewBox="0 0 1440 50" preserveAspectRatio="none"><path d="M0,50 C360,0 1080,0 1440,50 L1440,0 L0,0 Z" fill="var(--text)"/></svg>
+</div>
+
+<!-- TRENDS -->
+<section id="trends">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">行业风向</div>
+            <h2 class="section-title">哪些行业正在招人？</h2>
+            <div class="divider"></div>
+            <p class="section-desc">了解就业市场的需求变化，找到属于你的机会方向。</p>
+        </div>
+        <div class="trends-grid">
+            <div class="trend-list">
+                <div class="trend-item reveal"><div class="trend-icon ti-up"><svg class="ico"><use href="#i-battery"/></svg></div><div class="trend-info"><h4>新能源 & 电动汽车</h4><span>电池工程师、充电运维、销售顾问</span></div><div class="trend-bar-track"><div class="trend-bar-fill tbf-green" style="width:0%" data-width="92%"></div></div><div class="trend-percent tp-up">+92%</div></div>
+                <div class="trend-item reveal reveal-d1"><div class="trend-icon ti-hot"><svg class="ico"><use href="#i-robot"/></svg></div><div class="trend-info"><h4>AI & 大数据</h4><span>算法工程师、数据标注、AI产品经理</span></div><div class="trend-bar-track"><div class="trend-bar-fill tbf-red" style="width:0%" data-width="85%"></div></div><div class="trend-percent tp-hot">+85%</div></div>
+                <div class="trend-item reveal reveal-d2"><div class="trend-icon ti-new"><svg class="ico"><use href="#i-heart"/></svg></div><div class="trend-info"><h4>养老 & 健康服务</h4><span>养老护理员、健康管理师、康复技师</span></div><div class="trend-bar-track"><div class="trend-bar-fill tbf-blue" style="width:0%" data-width="78%"></div></div><div class="trend-percent tp-new">+78%</div></div>
+                <div class="trend-item reveal reveal-d3"><div class="trend-icon ti-steady"><svg class="ico"><use href="#i-package"/></svg></div><div class="trend-info"><h4>电商 & 直播运营</h4><span>短视频运营、直播中控、供应链管理</span></div><div class="trend-bar-track"><div class="trend-bar-fill tbf-gold" style="width:0%" data-width="65%"></div></div><div class="trend-percent tp-steady">+65%</div></div>
+                <div class="trend-item reveal reveal-d4"><div class="trend-icon ti-up"><svg class="ico"><use href="#i-wheat"/></svg></div><div class="trend-info"><h4>现代农业 & 乡村振兴</h4><span>农产品电商、农技推广、乡村旅游</span></div><div class="trend-bar-track"><div class="trend-bar-fill tbf-green" style="width:0%" data-width="55%"></div></div><div class="trend-percent tp-up">+55%</div></div>
+            </div>
+            <div class="trend-note reveal-right">
+                <h3>给求职者的行业建议</h3>
+                <p>不要盲目追逐"热门行业"。关键是找到你的已有技能和新兴需求之间的交叉点。</p>
+                <p>比如你在传统制造业做质检，你的质量管理经验可以迁移到新能源汽车的供应链管理岗位。</p>
+                <div class="highlight-box">
+                    <h5>核心思路：可迁移技能 > 行业经验</h5>
+                    <p>沟通能力、项目管理、数据分析、客户维护——这些"软技能"在不同行业间的价值是相通的。</p>
+                </div>
+                <div style="margin-top:1rem;padding:.6rem .8rem;background:rgba(0,0,0,.03);border-radius:.4rem;font-size:.72rem;color:var(--text-light);line-height:1.6"><strong>数据说明：</strong>左侧增长率为综合各大招聘平台（智联招聘、BOSS直聘、猎聘等）2024年岗位发布量同比变化估算值，非官方统计数据，仅供参考方向判断。</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- RESOURCES -->
+<section id="resources">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">实用工具箱</div>
+            <h2 class="section-title">你需要的帮助，都在这里</h2>
+            <div class="divider"></div>
+            <p class="section-desc">从经济补贴到心理支持，从技能提升到求职技巧，帮你系统地度过这段时间。</p>
+        </div>
+        <div class="resource-filter">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="fin">经济保障</button>
+            <button class="filter-btn" data-filter="ins">社保</button>
+            <button class="filter-btn" data-filter="skill">技能提升</button>
+            <button class="filter-btn" data-filter="mind">心理</button>
+            <button class="filter-btn" data-filter="job">求职</button>
+            <button class="filter-btn" data-filter="biz">创业</button>
+            <button class="filter-btn" data-filter="legal">法律</button>
+        </div>
+        <div class="resource-grid" id="resourceGrid">
+            <a href="#panel-unemploy" class="resource-card reveal" data-category="fin"><div class="r-num">01</div><div class="r-info"><h4>失业保险金申领全指南</h4><p>累计缴纳失业保险满1年即可申领，最长可领24个月。附详细申请流程。</p><span class="r-tag tag-fin">经济保障</span></div></a>
+            <a href="#panel-social" class="resource-card reveal reveal-d1" data-category="ins"><div class="r-num">02</div><div class="r-info"><h4>灵活就业社保续缴方案</h4><p>失业期间如何以个人身份续缴社保？断缴影响与补救方法。</p><span class="r-tag tag-ins">社保指南</span></div></a>
+            <a href="#panel-training" class="resource-card reveal reveal-d2" data-category="skill"><div class="r-num">03</div><div class="r-info"><h4>免费职业技能培训项目</h4><p>人社部"职业技能提升行动"覆盖50+城市，提供IT、设计、运营等30+方向。</p><span class="r-tag tag-skill">技能提升</span></div></a>
+            <a href="#mental" class="resource-card reveal reveal-d3" data-category="mind"><div class="r-num">04</div><div class="r-info"><h4>心理咨询与情感支持</h4><p>全国24小时心理援助热线、免费公益心理咨询平台、线上互助社群。</p><span class="r-tag tag-mind">心理支持</span></div></a>
+            <a href="#toolkit" class="resource-card reveal reveal-d4" data-category="job" onclick="event.preventDefault();tkSwitch('jobs');document.getElementById('toolkit').scrollIntoView({behavior:'smooth'})"><div class="r-num">05</div><div class="r-info"><h4>简历优化与面试攻略</h4><p>如何解释职业空窗期？针对不同年龄段的求职策略、高转化率简历模板。</p><span class="r-tag tag-job">求职攻略</span></div></a>
+            <a href="#toolkit" class="resource-card reveal reveal-d5" data-category="biz" onclick="event.preventDefault();showToast('info','创业指南内容筹备中，敬请期待')"><div class="r-num">06</div><div class="r-info"><h4>副业与创业起步指南</h4><p>自媒体运营、社区电商、自由职业……探索灵活就业的多种可能性。</p><span class="r-tag tag-biz">新可能</span></div></a>
+            <a href="#panel-rights" class="resource-card reveal" data-category="legal"><div class="r-num">07</div><div class="r-info"><h4>劳动者权益法律指南</h4><p>经济补偿标准(N/N+1)、违法辞退维权路径、劳动仲裁流程。</p><span class="r-tag tag-legal">法律维权</span></div></a>
+            <a href="#assess" class="resource-card reveal reveal-d1" data-category="job"><div class="r-num">08</div><div class="r-info"><h4>职业转型路径规划</h4><p>转行评估框架、热门转型方向、可迁移技能梳理、行业薪资对照表。</p><span class="r-tag tag-career">转型规划</span></div></a>
+        </div>
+
+        <div class="resource-expand">
+            <div class="expand-tabs">
+                <button class="expand-tab active" data-panel="unemploy">失业保险详解</button>
+                <button class="expand-tab" data-panel="social">社保续缴方案</button>
+                <button class="expand-tab" data-panel="training">免费培训课程</button>
+                <button class="expand-tab" data-panel="rights">劳动权益保障</button>
+            </div>
+            <div class="expand-panel active" id="panel-unemploy">
+                <h3>失业保险金申领详解</h3>
+                <h4>申领条件</h4>
+                <ul><li>失业前累计缴纳失业保险满1年</li><li>非因本人意愿中断就业（被裁员、合同到期不续签等）</li><li>已办理失业登记，并有求职要求</li></ul>
+                <h4>领取标准与时长</h4>
+                <ul><li>累计缴费1-5年：最长领取12个月</li><li>累计缴费5-10年：最长领取18个月</li><li>累计缴费10年以上：最长领取24个月</li><li>金额一般为当地最低工资的70%-90%（依据《社会保险法》第46条）</li></ul>
+                <h4>线上申领步骤</h4>
+                <ul><li>登录<a href="https://si.12333.gov.cn/" target="_blank" rel="noopener">国家社会保险公共服务平台</a>或当地社保APP</li><li>选择"失业保险金网上申领"</li><li>填写个人信息并上传解除劳动关系证明</li><li>审核通过后按月发放至绑定银行账户</li></ul>
+                <div class="info-box"><strong>重要提示：</strong>主动辞职通常不能领取失业保险金，但如果是因用人单位存在未缴社保、未足额支付工资等违法行为而被迫离职的，可以申领。请保留好相关证据。</div>
+            </div>
+            <div class="expand-panel" id="panel-social">
+                <h3>失业期间社保续缴方案</h3>
+                <h4>医保——最不能断的一项</h4>
+                <p>医保断缴次月起即无法享受报销待遇。建议失业后第一时间处理医保续缴。</p>
+                <h4>灵活就业人员参保</h4>
+                <ul><li>可单独缴纳养老保险和医疗保险</li><li>缴费基数可在当地平均工资的60%-300%之间选择</li><li>养老保险缴费比例为20%（个人全额承担）</li></ul>
+                <div class="info-box gold"><strong>省钱建议：</strong>经济紧张时可先选择最低缴费基数，确保不断缴即可。等重新就业后再恢复正常基数。</div>
+            </div>
+            <div class="expand-panel" id="panel-training">
+                <h3>免费职业技能培训项目</h3>
+                <h4>政府补贴类培训</h4>
+                <ul><li><strong>职业技能提升行动：</strong>人社部主导，覆盖全国，失业人员可免费参加</li><li><strong>创业培训（SIYB）：</strong>国际劳工组织认证课程</li></ul>
+                <h4>热门培训方向</h4>
+                <ul><li>互联网营销师（短视频运营、直播带货）</li><li>数据分析（Excel/Python/SQL基础）</li><li>UI/平面设计（Figma/PS/AI）</li><li>健康管理师、育婴员、养老护理员</li></ul>
+                <div class="info-box blue"><strong>如何查找当地培训项目：</strong>登录当地人社局官网 -> 搜索"职业技能培训"，或拨打<a href="tel:12333">12333</a>咨询。</div>
+            </div>
+            <div class="expand-panel" id="panel-rights">
+                <h3>劳动者权益保障指南</h3>
+                <h4>经济补偿标准</h4>
+                <ul><li><strong>N（工作年限）：</strong>每满1年支付1个月工资（《劳动合同法》第47条）</li><li><strong>N+1：</strong>未提前30天通知的，额外支付1个月工资</li><li><strong>2N：</strong>违法解除的，支付双倍经济补偿（《劳动合同法》第87条）</li></ul>
+                <h4>常见违法情形</h4>
+                <ul><li>以"末位淘汰"为由直接解除合同</li><li>变相降薪、调岗逼迫员工主动辞职</li><li>试用期无故辞退且不支付补偿</li></ul>
+                <h4>维权路径</h4>
+                <ul><li>第一步：与用人单位协商</li><li>第二步：向劳动监察大队投诉（<a href="tel:12333">12333</a>热线）</li><li>第三步：申请劳动仲裁（免费，一年时效）</li><li>第四步：对仲裁不服可向法院起诉</li></ul>
+                <div class="info-box"><strong>证据保存：</strong>劳动合同、工资条、考勤记录、工作邮件、离职通知书等都是重要证据。离职前请务必做好备份。</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ PERSONAL TOOLKIT ═══════ -->
+<section class="toolkit-section" id="toolkit">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">个人管理工具</div>
+            <h2 class="section-title">不只是看信息，更要行动</h2>
+            <div class="divider"></div>
+            <p class="section-desc">把求职、日记、财务、技能管理放在一个页面。数据自动保存在本地浏览器，无需注册，刷新不丢。</p>
+        </div>
+
+        <!-- Login Gate -->
+        <div class="tk-gate" id="tkGate">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <h3>登录后使用个人管理工具</h3>
+            <p>数据保存在云端，多设备同步，永不丢失</p>
+            <button class="tk-gate-btn" onclick="openAuth()">登录 / 注册</button>
+        </div>
+
+        <div class="tk-content" id="tkContent">
+        <div class="toolkit-tabs">
+            <button class="toolkit-tab active" data-tk="jobs" onclick="tkSwitch('jobs')"><svg class="ico"><use href="#i-briefcase"/></svg> 求职追踪</button>
+            <button class="toolkit-tab" data-tk="diary" onclick="tkSwitch('diary')"><svg class="ico"><use href="#i-clipboard"/></svg> 失业日记</button>
+            <button class="toolkit-tab" data-tk="finance" onclick="tkSwitch('finance')"><svg class="ico"><use href="#i-wallet"/></svg> 收支记账</button>
+            <button class="toolkit-tab" data-tk="skills" onclick="tkSwitch('skills')"><svg class="ico"><use href="#i-target"/></svg> 技能充电</button>
+        </div>
+
+        <!-- Jobs Panel -->
+        <div class="toolkit-panel active" id="tk-jobs">
+            <div class="toolkit-stats">
+                <div class="tk-stat s1"><div class="tk-stat-num" id="tkStatApply">0</div><div class="tk-stat-label">已投递</div></div>
+                <div class="tk-stat s2"><div class="tk-stat-num" id="tkStatInterview">0</div><div class="tk-stat-label">面试中</div></div>
+                <div class="tk-stat s3"><div class="tk-stat-num" id="tkStatOffer">0</div><div class="tk-stat-label">Offer</div></div>
+                <div class="tk-stat s4"><div class="tk-stat-num" id="tkStatReject">0</div><div class="tk-stat-label">被拒</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+                <div class="tk-filter" id="tkJobFilter">
+                    <button class="tk-chip active" data-f="all" onclick="tkFilterJobs('all')">全部</button>
+                    <button class="tk-chip" data-f="投递" onclick="tkFilterJobs('投递')">投递</button>
+                    <button class="tk-chip" data-f="面试" onclick="tkFilterJobs('面试')">面试</button>
+                    <button class="tk-chip" data-f="Offer" onclick="tkFilterJobs('Offer')">Offer</button>
+                    <button class="tk-chip" data-f="拒绝" onclick="tkFilterJobs('拒绝')">拒绝</button>
+                </div>
+                <button class="tk-btn-add" onclick="tkOpenJobModal()"><svg class="ico"><use href="#i-plus"/></svg> 新增</button>
+            </div>
+            <div id="tkJobList"></div>
+        </div>
+
+        <!-- Diary Panel -->
+        <div class="toolkit-panel" id="tk-diary">
+            <div class="tk-day-counter">
+                <div class="tk-day-num" id="tkDayCount">1</div>
+                <div class="tk-day-label">失业第 N 天</div>
+                <div style="font-size:.72rem;color:var(--text-muted);margin-top:.3rem">起始日期：<input type="date" id="tkUnempStart" style="font-size:.78rem;border:1px solid var(--border);border-radius:.3rem;padding:.15rem .3rem;background:#fff;color:var(--text)" onchange="tkSaveStartDate()"></div>
+            </div>
+            <div class="tk-card">
+                <div style="font-size:.85rem;font-weight:600;margin-bottom:.6rem">今日心情打卡</div>
+                <div class="tk-mood-row" id="tkMoodRow"></div>
+                <input type="text" class="tk-input" id="tkAchievement" placeholder="今天的小成就（投了简历？学了新东西？）">
+                <button class="tk-checkin-btn" id="tkCheckinBtn" onclick="tkSubmitDiary()">完成今日打卡</button>
+            </div>
+            <div id="tkDiaryList" style="margin-top:1rem"></div>
+        </div>
+
+        <!-- Finance Panel -->
+        <div class="toolkit-panel" id="tk-finance">
+            <div class="tk-finance-summary">
+                <div class="tk-fin-card"><div class="tk-fin-label">本月支出</div><div class="tk-fin-num expense" id="tkMonthExp">¥0</div></div>
+                <div class="tk-fin-card"><div class="tk-fin-label">本月收入</div><div class="tk-fin-num income" id="tkMonthInc">¥0</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+                <div style="font-size:.85rem;color:var(--text-muted)">存款余额：¥<input type="number" id="tkSavings" value="50000" style="width:80px;font-size:.85rem;border:1px solid var(--border);border-radius:.3rem;padding:.15rem .3rem;background:#fff;color:var(--text)" onchange="tkSaveSavings()"> · 可撑 <span id="tkSavingsMonths" style="font-weight:700;color:var(--accent)">--</span> 月</div>
+                <button class="tk-btn-add" onclick="tkOpenFinanceModal()"><svg class="ico"><use href="#i-plus"/></svg> 记一笔</button>
+            </div>
+            <div id="tkTxnList"></div>
+        </div>
+
+        <!-- Skills Panel -->
+        <div class="toolkit-panel" id="tk-skills">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:.6rem">
+                <button class="tk-btn-add" onclick="tkOpenSkillModal()"><svg class="ico"><use href="#i-plus"/></svg> 新增计划</button>
+            </div>
+            <div id="tkSkillList"></div>
+        </div>
+        </div><!-- /tk-content -->
+    </div>
+</section>
+
+<!-- TK MODALS -->
+<div class="tk-modal-overlay" id="tkJobModal">
+    <div class="tk-modal">
+        <div class="tk-modal-title" id="tkJobModalTitle">新增投递</div>
+        <input type="hidden" id="tkJobId">
+        <div class="tk-form-group"><label class="tk-form-label">公司名称 *</label><input class="tk-form-input" id="tkJobCompany" placeholder="如：腾讯"></div>
+        <div class="tk-form-group"><label class="tk-form-label">职位名称 *</label><input class="tk-form-input" id="tkJobPosition" placeholder="如：后端开发工程师"></div>
+        <div class="tk-form-row">
+            <div class="tk-form-group"><label class="tk-form-label">薪资范围</label><input class="tk-form-input" id="tkJobSalary" placeholder="如：20-30k"></div>
+            <div class="tk-form-group"><label class="tk-form-label">投递日期</label><input type="date" class="tk-form-input" id="tkJobApplyDate"></div>
+        </div>
+        <div class="tk-form-row">
+            <div class="tk-form-group"><label class="tk-form-label">状态</label><select class="tk-form-select" id="tkJobStatus"><option>投递</option><option>笔试</option><option>面试</option><option>Offer</option><option>拒绝</option><option>已放弃</option></select></div>
+            <div class="tk-form-group"><label class="tk-form-label">跟进日期</label><input type="date" class="tk-form-input" id="tkJobFollowDate"></div>
+        </div>
+        <div class="tk-form-group"><label class="tk-form-label">备注</label><textarea class="tk-form-textarea" id="tkJobFeedback" rows="2" placeholder="如：技术面通过，等HR面通知"></textarea></div>
+        <div class="tk-modal-actions"><button class="tk-btn-cancel" onclick="tkCloseModal('tkJobModal')">取消</button><button class="tk-btn-save" onclick="tkSaveJob()">保存</button></div>
+    </div>
+</div>
+
+<div class="tk-modal-overlay" id="tkFinanceModal">
+    <div class="tk-modal">
+        <div class="tk-modal-title">记一笔</div>
+        <div class="tk-form-group"><label class="tk-form-label">类型</label><div style="display:flex;gap:.4rem"><button type="button" class="tk-chip active" id="tkTypeExp" onclick="tkSelectTxnType('expense')">支出</button><button type="button" class="tk-chip" id="tkTypeInc" onclick="tkSelectTxnType('income')">收入</button></div></div>
+        <input type="hidden" id="tkTxnType" value="expense">
+        <div class="tk-form-group"><label class="tk-form-label">金额 (¥) *</label><input type="number" class="tk-form-input" id="tkTxnAmount" placeholder="如：3500"></div>
+        <div class="tk-form-row">
+            <div class="tk-form-group"><label class="tk-form-label">分类</label><select class="tk-form-select" id="tkTxnCategory"><option>住房</option><option>餐饮</option><option>交通</option><option>求职</option><option>学习</option><option>娱乐</option><option>医疗</option><option>其他</option></select></div>
+            <div class="tk-form-group"><label class="tk-form-label">日期</label><input type="date" class="tk-form-input" id="tkTxnDate"></div>
+        </div>
+        <div class="tk-form-group"><label class="tk-form-label">备注</label><input class="tk-form-input" id="tkTxnNote" placeholder="如：七月房租"></div>
+        <div class="tk-modal-actions"><button class="tk-btn-cancel" onclick="tkCloseModal('tkFinanceModal')">取消</button><button class="tk-btn-save" onclick="tkSaveTxn()">保存</button></div>
+    </div>
+</div>
+
+<div class="tk-modal-overlay" id="tkSkillModal">
+    <div class="tk-modal">
+        <div class="tk-modal-title" id="tkSkillModalTitle">新增学习计划</div>
+        <input type="hidden" id="tkSkillId">
+        <div class="tk-form-group"><label class="tk-form-label">计划名称 *</label><input class="tk-form-input" id="tkSkillName" placeholder="如：LeetCode刷题"></div>
+        <div class="tk-form-group"><label class="tk-form-label">类型</label><select class="tk-form-select" id="tkSkillType"><option>刷题</option><option>技术学习</option><option>语言</option><option>证书</option><option>其他</option></select></div>
+        <div class="tk-form-row">
+            <div class="tk-form-group"><label class="tk-form-label">当前进度</label><input type="number" class="tk-form-input" id="tkSkillCurrent" placeholder="如：45"></div>
+            <div class="tk-form-group"><label class="tk-form-label">目标总量</label><input type="number" class="tk-form-input" id="tkSkillTarget" placeholder="如：150"></div>
+        </div>
+        <div class="tk-form-group"><label class="tk-form-label">每日目标</label><input class="tk-form-input" id="tkSkillDailyGoal" placeholder="如：每天3题"></div>
+        <div class="tk-modal-actions"><button class="tk-btn-cancel" onclick="tkCloseModal('tkSkillModal')">取消</button><button class="tk-btn-save" onclick="tkSaveSkill()">保存</button></div>
+    </div>
+</div>
+
+<div class="tk-confirm-overlay" id="tkConfirmOverlay">
+    <div class="tk-confirm-box">
+        <div class="tk-confirm-title" id="tkConfirmTitle">确认操作</div>
+        <div class="tk-confirm-text" id="tkConfirmText"></div>
+        <div class="tk-confirm-actions"><button class="tk-btn-no" onclick="tkCloseConfirm()">取消</button><button class="tk-btn-yes" id="tkConfirmYes">确认</button></div>
+    </div>
+</div>
+
+<!-- ═══════ AUTH MODAL ═══════ -->
+<div class="auth-overlay" id="authOverlay">
+    <div class="auth-box">
+        <button class="auth-close" onclick="closeAuth()">&times;</button>
+        <div class="auth-title" id="authTitle">登录</div>
+        <div class="auth-sub">登录后数据将保存在云端，多设备同步</div>
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-mode="login" onclick="switchAuthMode('login')">登录</button>
+            <button class="auth-tab" data-mode="register" onclick="switchAuthMode('register')">注册</button>
+        </div>
+        <form class="auth-form active" id="loginForm" onsubmit="event.preventDefault();doLogin()">
+            <input type="email" class="auth-input" id="loginEmail" placeholder="邮箱地址" required>
+            <input type="password" class="auth-input" id="loginPassword" placeholder="密码" required>
+            <button type="submit" class="auth-btn" id="loginBtn">登录</button>
+            <div class="auth-error" id="loginError"></div>
+        </form>
+        <form class="auth-form" id="registerForm" onsubmit="event.preventDefault();doRegister()">
+            <input type="text" class="auth-input" id="regNickname" placeholder="昵称（选填）" maxlength="64">
+            <input type="email" class="auth-input" id="regEmail" placeholder="邮箱地址" required>
+            <input type="password" class="auth-input" id="regPassword" placeholder="密码（至少6位）" minlength="6" required>
+            <button type="submit" class="auth-btn" id="registerBtn">注册</button>
+            <div class="auth-error" id="registerError"></div>
+        </form>
+    </div>
+</div>
+
+<!-- SKILL ASSESSMENT -->
+<section class="assess-section" id="assess">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">互动工具</div>
+            <h2 class="section-title">你的可迁移技能盘点</h2>
+            <div class="divider"></div>
+            <p class="section-desc">回答5个问题，帮你发现自己的核心能力优势。结果自动保存，刷新不丢失。</p>
+        </div>
+        <div class="assess-container">
+            <div class="assess-progress" id="assessProgress">
+                <div class="assess-bar"><div class="assess-bar-fill" id="assessBarFill" style="width:0%"></div></div>
+                <div class="assess-step-text" id="assessStepText">1/5</div>
+            </div>
+            <div class="assess-card" id="assessCard">
+                <h3 id="assessQuestion"></h3>
+                <p id="assessHint">选择最贴近的一个</p>
+                <div class="assess-options" id="assessOptions"></div>
+                <div class="assess-nav">
+                    <button class="btn btn-outline btn-sm" id="assessPrev" style="display:none" onclick="assessPrevQ()">上一题</button>
+                    <button class="btn btn-primary btn-sm" id="assessNext" onclick="assessNextQ()">下一题</button>
+                </div>
+            </div>
+            <div class="assess-result" id="assessResult">
+                <h3>你的技能画像</h3>
+                <div class="radar-wrap"><svg class="radar-svg" id="radarSvg" viewBox="0 0 280 280"></svg></div>
+                <div class="skill-result-grid" id="skillResultGrid"></div>
+                <div style="text-align:center;margin-top:1rem"><button class="btn btn-outline btn-sm" onclick="resetAssess()">重新测评</button></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MENTAL -->
+<section class="mental-section" id="mental">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">心理关怀</div>
+            <h2 class="section-title">照顾好自己，才能重新出发</h2>
+            <div class="divider"></div>
+            <p class="section-desc">寻求帮助不是软弱，而是智慧。以下是你可以随时使用的支持资源。</p>
+        </div>
+        <div class="mental-grid">
+            <div>
+                <a href="tel:4001619995" class="hotline-card reveal" style="text-decoration:none;color:inherit;display:block"><div class="hotline-num">400-161-9995</div><div class="hotline-name">希望24热线</div><div class="hotline-desc">全国24小时免费心理危机干预热线。</div><div class="hotline-time">24小时在线</div></a>
+                <a href="tel:01082951332" class="hotline-card reveal reveal-d1" style="text-decoration:none;color:inherit;display:block;margin-top:1rem"><div class="hotline-num">010-82951332</div><div class="hotline-name">北京心理危机研究与干预中心</div><div class="hotline-desc">提供专业的心理危机干预服务。</div><div class="hotline-time">24小时在线</div></a>
+                <a href="tel:12320" class="hotline-card reveal reveal-d2" style="text-decoration:none;color:inherit;display:block;margin-top:1rem"><div class="hotline-num">12320-5</div><div class="hotline-name">全国卫生热线心理援助</div><div class="hotline-desc">卫健委官方心理援助热线。</div><div class="hotline-time">工作日 8:00-17:00</div></a>
+            </div>
+            <div>
+                <div class="tips-box reveal">
+                    <h4>失业期间的心理自救指南</h4>
+                    <div class="tip-item"><div class="tip-num">01</div><div class="tip-text"><strong>允许自己难过，但设定期限。</strong> 给自己3-5天的"消化期"。</div></div>
+                    <div class="tip-item"><div class="tip-num">02</div><div class="tip-text"><strong>维持日常作息。</strong> 固定的起床、吃饭、运动时间是心理防线。</div></div>
+                    <div class="tip-item"><div class="tip-num">03</div><div class="tip-text"><strong>和信任的人聊聊。</strong> 不需要解决方案，只需要被听到。</div></div>
+                    <div class="tip-item"><div class="tip-num">04</div><div class="tip-text"><strong>减少无效信息摄入。</strong> 少看贩卖焦虑的内容，多关注可操作的信息。</div></div>
+                    <div class="tip-item"><div class="tip-num">05</div><div class="tip-text"><strong>每天做一件有成就感的小事。</strong> 微小的正反馈是抵抗无力感的武器。</div></div>
+                    <div class="tip-item"><div class="tip-num">06</div><div class="tip-text"><strong>持续两周以上情绪低落，请寻求专业帮助。</strong> 及早干预效果最好。</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STORIES -->
+<section id="stories">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">真实经历</div>
+            <h2 class="section-title">他们的故事，也是你的力量</h2>
+            <div class="divider"></div>
+            <p class="section-desc">每一段低谷都有走出去的人。</p>
+        </div>
+        <div class="stories-grid">
+            <div class="story-spotlight reveal">
+                <div class="spotlight-visual">
+                    <div class="spotlight-icon-wrap"><svg class="ico"><use href="#i-briefcase"/></svg></div>
+                </div>
+                <div class="spotlight-body">
+                    <span class="spotlight-tag">精选故事</span>
+                    <p class="story-quote">被裁员那天我38岁。花了三个月投了200多份简历，只收到3个面试。后来放下了"必须做管理"的执念，认真想想自己到底擅长什么。现在和两个前同事做企业数字化咨询，收入不如以前稳定，但每天醒来觉得有盼头。</p>
+                    <div class="story-author"><div class="story-avatar av1">陈</div><div><div class="story-name">陈先生，38岁</div><div class="story-role">前互联网中层 -> 数字化咨询创业</div></div></div>
+                    <div class="story-outcome"><svg class="ico"><use href="#i-check"/></svg> 失业8个月后创业，现在团队7人</div>
+                </div>
+            </div>
+            <div class="story-card reveal reveal-d1"><p class="story-quote">全职妈妈五年后想重返职场，投了上百份简历，回复寥寥。后来参加了政府的免费电商培训，从社区团购做起，现在自己开了小店。</p><div class="story-author"><div class="story-avatar av2">林</div><div><div class="story-name">林女士，34岁</div><div class="story-role">全职妈妈 -> 社区电商</div></div></div><div class="story-outcome"><svg class="ico"><use href="#i-check"/></svg> 从0开始，半年做到月入8000+</div></div>
+            <div class="story-card reveal reveal-d2"><p class="story-quote">毕业即失业，秋招春招颗粒无收。后来调整策略不海投了，专攻一个方向。三个月后上岸了。</p><div class="story-author"><div class="story-avatar av3">王</div><div><div class="story-name">小王，23岁</div><div class="story-role">2024届毕业生 -> 产品经理</div></div></div><div class="story-outcome"><svg class="ico"><use href="#i-check"/></svg> 毕业4个月后成功入职心仪公司</div></div>
+            <div class="story-card reveal reveal-d3"><p class="story-quote">工厂搬到东南亚，45岁的我突然失业了。招聘软件上的年龄筛选直接把我排除在外。后来做物流配送，虽然辛苦但养得起家。</p><div class="story-author"><div class="story-avatar av4">张</div><div><div class="story-name">张师傅，45岁</div><div class="story-role">前制造业工人 -> 物流配送</div></div></div><div class="story-outcome"><svg class="ico"><use href="#i-check"/></svg> 稳定收入，月入7000-9000元</div></div>
+            <div class="story-card reveal reveal-d4"><p class="story-quote">从教培行业出来后，消沉了两个月，后来考了健康管理师证书，现在在社区健康中心工作。</p><div class="story-author"><div class="story-avatar av5">李</div><div><div class="story-name">李老师，31岁</div><div class="story-role">前教培老师 -> 健康管理师</div></div></div><div class="story-outcome"><svg class="ico"><use href="#i-check"/></svg> 3个月完成转型，收入恢复80%</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-section">
+    <div class="container">
+        <div class="quote-inner">
+            <div class="quote-icon">&ldquo;</div>
+            <div class="quote-text" id="quoteText">人不是为失败而生的。一个人可以被毁灭，但不能被打败。</div>
+            <div class="quote-author" id="quoteAuthor">—— 海明威 《老人与海》</div>
+            <div class="quote-dots" id="quoteDots"></div>
+        </div>
+    </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="problems" id="plan">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">行动路线</div>
+            <h2 class="section-title">失业后的30天行动清单</h2>
+            <div class="divider"></div>
+            <p class="section-desc">按照这个节奏，一步一步来。点击可标记已完成，进度自动保存。</p>
+        </div>
+        <div class="timeline-container">
+            <div class="tl-item reveal"><div class="tl-dot dot-red"></div><div class="tl-content"><div class="tl-step">第 1-3 天</div><h4>稳定情绪，处理紧急事务</h4><ul class="tl-checklist" data-phase="1"><li>办理离职手续，拿到离职证明</li><li>确认社保停缴时间</li><li>盘点银行存款，算清"财务跑道"</li><li>检查是否符合失业保险金申领条件</li></ul></div></div>
+            <div class="tl-item reveal"><div class="tl-dot dot-gold"></div><div class="tl-content"><div class="tl-step">第 4-7 天</div><h4>申领保险，盘点资源</h4><ul class="tl-checklist" data-phase="2"><li>前往社保局或线上申领失业保险金</li><li>办理灵活就业社保续缴</li><li>梳理人脉、技能、可用时间</li><li>如有劳动纠纷，咨询法律援助热线12348</li></ul></div></div>
+            <div class="tl-item reveal"><div class="tl-dot dot-accent"></div><div class="tl-content"><div class="tl-step">第 2 周</div><h4>更新简历，建立日常节奏</h4><ul class="tl-checklist" data-phase="3"><li>根据目标岗位重新打磨简历</li><li>准备好"空窗期"话术</li><li>建立每日作息表</li><li>了解目标行业最新动态</li></ul></div></div>
+            <div class="tl-item reveal"><div class="tl-dot dot-blue"></div><div class="tl-content"><div class="tl-step">第 3 周</div><h4>广泛投递，提升技能</h4><ul class="tl-checklist" data-phase="4"><li>每天保持10-15份有效投递</li><li>激活人脉：让朋友知道你在找工作</li><li>报名一门短期技能课程</li><li>考虑拓展求职范围</li></ul></div></div>
+            <div class="tl-item reveal"><div class="tl-dot dot-green"></div><div class="tl-content"><div class="tl-step">第 4 周</div><h4>复盘调整，拓宽可能</h4><ul class="tl-checklist" data-phase="5"><li>复盘求职数据：投递数、回复率、面试转化率</li><li>根据反馈调整简历和策略</li><li>评估副业、自由职业、转行等多种可能性</li><li>如果一个月后仍无进展，不要气馁</li></ul></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- CALCULATOR -->
+<section class="calc-section">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">实用工具</div>
+            <h2 class="section-title">失业期间财务计算器</h2>
+            <div class="divider"></div>
+            <p class="section-desc">了解自己的"财务跑道"有多长，才能更从容地做决策。数据自动保存。</p>
+        </div>
+        <div class="calc-container">
+            <div class="calc-form reveal">
+                <h3>填写你的信息</h3>
+                <div class="form-group"><label class="form-label">当前存款总额（元）</label><input type="number" class="form-input" id="calc-savings" value="80000"></div>
+                <div class="form-group"><label class="form-label">每月固定支出（元）</label><input type="number" class="form-input" id="calc-expense" value="8000"></div>
+                <div class="form-group"><label class="form-label">每月可领取失业保险金（元）</label><input type="number" class="form-input" id="calc-benefit" value="1800"></div>
+                <div class="form-group"><label class="form-label">每月其他收入（元）</label><input type="number" class="form-input" id="calc-other" value="0"></div>
+                <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.5rem" onclick="calculate(true)">计算财务跑道</button>
+            </div>
+            <div class="calc-result reveal reveal-d1">
+                <h3>你的财务状况分析</h3>
+                <div class="result-row"><span class="result-label">每月固定支出</span><span class="result-value danger" id="res-expense">-8,000 元</span></div>
+                <div class="result-row"><span class="result-label">失业保险金</span><span class="result-value safe" id="res-benefit">+1,800 元</span></div>
+                <div class="result-row"><span class="result-label">其他收入</span><span class="result-value safe" id="res-other">+0 元</span></div>
+                <div class="result-row result-total"><span class="result-label">每月净缺口</span><span class="result-value danger" id="res-gap">-6,200 元</span></div>
+                <div class="result-bar"><div class="bar-track"><div class="bar-fill" id="res-bar" style="width:45%;background:linear-gradient(90deg,var(--green),var(--gold),var(--accent))"></div></div><div class="bar-labels"><span>0月</span><span id="res-months">约可支撑13个月</span><span>24月</span></div></div>
+                <div id="res-advice" style="margin-top:1.5rem;padding:1rem;background:rgba(74,154,96,.1);border-radius:.5rem;font-size:.85rem;color:rgba(240,236,228,.7);line-height:1.8"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">常见问题</div>
+            <h2 class="section-title">你可能想问的</h2>
+            <div class="divider"></div>
+        </div>
+        <div class="faq-list">
+            <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>主动辞职能领失业保险金吗？</span><span class="faq-arrow">▾</span></button><div class="faq-a"><div class="faq-a-inner">一般情况下不能。但以下例外可以：①用人单位存在未缴社保等违法行为被迫离职的；②合同期满单位降低条件续约被拒绝的。注意保留证据。</div></div></div>
+            <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>面试时怎么解释"空窗期"？</span><span class="faq-arrow">▾</span></button><div class="faq-a"><div class="faq-a-inner">诚实但积极。可以说"我利用这段时间做了XX学习/考了XX证书/做了XX项目"，展示时间没有被浪费。</div></div></div>
+            <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>社保断缴多久影响医保报销？</span><span class="faq-arrow">▾</span></button><div class="faq-a"><div class="faq-a-inner">大多数地区断缴次月起就无法报销。建议失业后第一时间以灵活就业身份续缴医保。</div></div></div>
+            <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>35岁以上真的找不到工作了吗？</span><span class="faq-arrow">▾</span></button><div class="faq-a"><div class="faq-a-inner">"35岁门槛"存在于部分行业，但不是全部。制造业、医疗、教育、咨询等行业对经验丰富的从业者需求很大。关键是调整预期和发挥经验优势。</div></div></div>
+            <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>失业后适合创业吗？</span><span class="faq-arrow">▾</span></button><div class="faq-a"><div class="faq-a-inner">建议：①确保至少6个月经济缓冲；②从小做起验证需求；③利用好政府创业扶持政策；④避免"冲动创业"。</div></div></div>
+            <div class="faq-item reveal"><button class="faq-q" onclick="toggleFaq(this)"><span>如何申请免费职业技能培训？</span><span class="faq-arrow">▾</span></button><div class="faq-a"><div class="faq-a-inner">①登录当地人社局官网搜索；②拨打<a href="tel:12333">12333</a>；③前往社区就业服务窗口；④下载"掌上12333"APP。</div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- COMMUNITY -->
+<section class="community-section" id="community">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-label">互助社区</div>
+            <h2 class="section-title">一起走过这段路</h2>
+            <div class="divider"></div>
+        </div>
+        <div class="community-grid">
+            <div class="community-card reveal"><div class="cc-img cc1"><svg class="ico"><use href="#i-clipboard"/></svg></div><div class="cc-body"><h4>求职经验分享会</h4><p>每周三晚8点，邀请成功上岸的小伙伴分享经验。</p><div class="cc-meta"><span class="cc-tag">每周三 20:00</span><span>3600+ 人参加（目标）</span></div></div></div>
+            <div class="community-card reveal reveal-d1"><div class="cc-img cc2"><svg class="ico"><use href="#i-handshake"/></svg></div><div class="cc-body"><h4>求职搭子互助组</h4><p>两人一组互相督促，平均求职周期缩短30%。</p><div class="cc-meta"><span class="cc-tag">随时匹配</span><span>1200+ 对搭子（目标）</span></div></div></div>
+            <div class="community-card reveal reveal-d2"><div class="cc-img cc3"><svg class="ico"><use href="#i-lightbulb"/></svg></div><div class="cc-body"><h4>技能互换市集</h4><p>用你会的换你想学的，失业期间也是提升的好时机。</p><div class="cc-meta"><span class="cc-tag">每日活跃</span><span>800+ 交换完成（目标）</span></div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+    <div class="cta-bg"></div>
+    <div class="container">
+        <div class="section-label">加入社区</div>
+        <h2 class="section-title">一个人走得快，一群人走得远</h2>
+        <div class="divider"></div>
+        <p class="section-desc">加入失业互助社区，完全免费，无任何门槛。</p>
+        <div class="cta-actions">
+            <a href="#" class="btn btn-primary" onclick="event.preventDefault();showToast('info','社群入口即将开放，请先收藏本页面')">加入互助社群 <span class="prototype-tag">筹备中</span></a>
+            <a href="#" class="btn btn-dark" onclick="event.preventDefault();showToast('info','故事征集通道即将开放')">分享你的故事</a>
+        </div>
+        <p class="cta-hint">已有 <strong>12,000+</strong> 伙伴在这里。<br><small style="font-size:.72rem;color:var(--text-light)">（社区目标数据，平台持续建设中）</small></p>
+    </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter">
+    <div class="container">
+        <div class="newsletter-inner">
+            <div class="newsletter-text"><h3>订阅每周就业简报</h3><p>每周一封，包含最新政策、岗位推荐和社区精选。不多发，不骚扰。</p></div>
+            <div class="newsletter-form">
+                <input type="email" id="newsletterEmail" placeholder="输入你的邮箱地址">
+                <button class="btn btn-primary btn-sm" onclick="subscribeNewsletter()">订阅</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="logo">重启<small>RESTART</small></a>
+                <p>一个为失业人群提供信息、资源与社区支持的公益平台。</p>
+                <div class="footer-emergency">
+                    <h6>紧急求助</h6>
+                    <a href="tel:4001619995">心理热线 400-161-9995</a>
+                    <a href="tel:12333">人社热线 12333</a>
+                </div>
+            </div>
+            <div class="footer-col"><h5>经济保障</h5><a href="#panel-unemploy">失业保险申领</a><a href="#panel-social">社保续缴指南</a><a href="#panel-unemploy" onclick="event.preventDefault();document.getElementById('panel-unemploy').scrollIntoView({behavior:'smooth'})">创业担保贷款</a><a href="#" onclick="event.preventDefault();showToast('info','临时救助政策内容筹备中')">临时救助政策</a></div>
+            <div class="footer-col"><h5>能力提升</h5><a href="#panel-training">免费培训课程</a><a href="#toolkit" onclick="event.preventDefault();tkSwitch('jobs');document.getElementById('toolkit').scrollIntoView({behavior:'smooth'})">简历优化指南</a><a href="#" onclick="event.preventDefault();showToast('info','面试技巧内容筹备中')">面试技巧</a><a href="#assess">职业转型规划</a></div>
+            <div class="footer-col"><h5>心理支持</h5><a href="#mental">心理援助热线</a><a href="#mental">心理自救指南</a><a href="#community">互助社群</a></div>
+            <div class="footer-col"><h5>关于</h5><a href="#" onclick="event.preventDefault();showToast('info','平台介绍页面筹备中')">平台介绍</a><a href="#cta" onclick="event.preventDefault();document.getElementById('cta').scrollIntoView({behavior:'smooth'})">加入志愿者</a><a href="#" onclick="event.preventDefault();showToast('info','反馈通道筹备中，欢迎邮件至 feedback@restart.org')">意见反馈</a><a href="#" onclick="event.preventDefault();showToast('info','数据来源已在各数据点旁标注')">数据来源声明</a></div>
+        </div>
+        <div class="footer-bottom">
+            <span>重启 RESTART &copy; 2025 · 公益平台 · 内容仅供参考</span>
+            <div class="footer-legal"><a href="#" onclick="event.preventDefault();showToast('info','本页面为纯前端静态页面，不收集任何用户数据')">隐私声明</a><a href="#" onclick="event.preventDefault();showToast('info','本页面内容仅供参考，不构成专业建议')">使用条款</a><a href="#" onclick="event.preventDefault();showToast('info','本页面支持键盘导航和屏幕阅读器')">无障碍声明</a></div>
+        </div>
+    </div>
+</footer>
+
+<!-- QUICK NAV SIDEBAR -->
+<div class="quick-nav" id="quickNav">
+    <a href="#problems" class="quick-nav-item" data-label="困境" data-section="problems"><span class="quick-nav-dot"></span></a>
+    <a href="#trends" class="quick-nav-item" data-label="趋势" data-section="trends"><span class="quick-nav-dot"></span></a>
+    <a href="#resources" class="quick-nav-item" data-label="资源" data-section="resources"><span class="quick-nav-dot"></span></a>
+    <a href="#toolkit" class="quick-nav-item" data-label="工具" data-section="toolkit"><span class="quick-nav-dot"></span></a>
+    <a href="#assess" class="quick-nav-item" data-label="自测" data-section="assess"><span class="quick-nav-dot"></span></a>
+    <a href="#mental" class="quick-nav-item" data-label="心理" data-section="mental"><span class="quick-nav-dot"></span></a>
+    <a href="#stories" class="quick-nav-item" data-label="故事" data-section="stories"><span class="quick-nav-dot"></span></a>
+    <a href="#plan" class="quick-nav-item" data-label="规划" data-section="plan"><span class="quick-nav-dot"></span></a>
+    <a href="#faq" class="quick-nav-item" data-label="问答" data-section="faq"><span class="quick-nav-dot"></span></a>
+</div>
+
+<!-- FLOATING -->
+<div class="floating-help">
+    <a href="tel:4001619995" class="floating-btn hotline-btn"><svg class="ico"><use href="#i-phone-call"/></svg>心理热线</a>
+    <a href="#resources" class="floating-btn chat-btn"><svg class="ico"><use href="#i-message"/></svg>获取帮助</a>
+</div>
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部"><svg class="ico"><use href="#i-arrow-up"/></svg></button>
+
+<script>
+// ── TOAST ──
+function showToast(type, msg) {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    const icons = {success:'\u2713', info:'\u2139', error:'\u2715'};
+    t.innerHTML = '<span class="toast-icon">'+(icons[type]||'\u2139')+'</span>'+msg;
+    c.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3500);
+}
+
+// ── NAV ──
+const nav = document.getElementById('navbar');
+const backTop = document.getElementById('backTop');
+const navMobile = document.getElementById('navMobile');
+const navLinks = document.getElementById('navLinks');
+const mobileOverlay = document.getElementById('mobileOverlay');
+
+window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+    backTop.classList.toggle('show', window.scrollY > 600);
+});
+navMobile.addEventListener('click', () => {
+    navMobile.classList.toggle('active');
+    navLinks.classList.toggle('show');
+    mobileOverlay.classList.toggle('show');
+    document.body.style.overflow = navLinks.classList.contains('show') ? 'hidden' : '';
+});
+mobileOverlay.addEventListener('click', closeNav);
+function closeNav() {
+    navMobile.classList.remove('active'); navLinks.classList.remove('show');
+    mobileOverlay.classList.remove('show'); document.body.style.overflow = '';
+}
+
+// ── COUNTERS ──
+const counterObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target, target = parseFloat(el.dataset.count), suffix = el.dataset.suffix||'', decimal = parseInt(el.dataset.decimal)||0, start = performance.now();
+        (function animate(now) {
+            const p = Math.min((now - start) / 1500, 1), eased = 1 - Math.pow(1-p,3), v = eased * target;
+            el.textContent = (decimal ? v.toFixed(decimal) : Math.floor(v)) + suffix;
+            if (p < 1) requestAnimationFrame(animate);
+        })(start);
+        counterObserver.unobserve(el);
+    });
+}, {threshold:.5});
+document.querySelectorAll('.stat-num[data-count], .ring-num-val[data-count]').forEach(c => counterObserver.observe(c));
+
+// ── RING CHART ANIMATION ──
+const ringObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if(e.isIntersecting){
+            const ring = document.getElementById('ringFillArc');
+            if(ring) ring.classList.add('animated');
+            ringObs.unobserve(e.target);
+        }
+    });
+}, {threshold:.3});
+const ringEl = document.querySelector('.ring-chart');
+if(ringEl) ringObs.observe(ringEl);
+
+// ── QUICK NAV SIDEBAR ──
+const quickNav = document.getElementById('quickNav');
+const quickNavItems = document.querySelectorAll('.quick-nav-item');
+const navSections = ['problems','trends','resources','toolkit','assess','mental','stories','plan','faq'];
+window.addEventListener('scroll', () => {
+    // Show/hide
+    quickNav.classList.toggle('show', window.scrollY > 400);
+    // Active section
+    let current = '';
+    navSections.forEach(id => {
+        const el = document.getElementById(id);
+        if(el){
+            const rect = el.getBoundingClientRect();
+            if(rect.top <= 200 && rect.bottom >= 200) current = id;
+        }
+    });
+    quickNavItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.section === current);
+    });
+});
+quickNavItems.forEach(item => item.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.getElementById(item.dataset.section);
+    if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+}));
+
+// ── TREND BARS ──
+const trendObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting){e.target.style.width=e.target.dataset.width;trendObs.unobserve(e.target);} });
+}, {threshold:.5});
+document.querySelectorAll('.trend-bar-fill[data-width]').forEach(b => trendObs.observe(b));
+
+// ── REVEAL ──
+const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');revealObs.unobserve(e.target);} });
+}, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => revealObs.observe(el));
+
+// ── EXPAND TABS ──
+document.querySelectorAll('.expand-tab').forEach(tab => tab.addEventListener('click', () => {
+    document.querySelectorAll('.expand-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.expand-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.panel).classList.add('active');
+}));
+
+// ── RESOURCE FILTER ──
+document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.resource-card').forEach(card => {
+        if (filter === 'all' || card.dataset.category === filter) {
+            card.classList.remove('hidden');
+            card.style.display = 'flex';
+        } else {
+            card.classList.add('hidden');
+            card.style.display = 'none';
+        }
+    });
+}));
+
+// ── FAQ ──
+function toggleFaq(btn) {
+    const item = btn.parentElement, wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+    if(!wasOpen) item.classList.add('open');
+}
+
+// ── TIMELINE CHECKLIST (localStorage) ──
+const TL_KEY = 'restart_timeline_checklist';
+function loadTLState(){
+    try{ return JSON.parse(localStorage.getItem(TL_KEY))||{}; }catch(e){ return {}; }
+}
+function saveTLState(state){
+    try{ localStorage.setItem(TL_KEY, JSON.stringify(state)); }catch(e){}
+}
+function initTimeline(){
+    const state = loadTLState();
+    document.querySelectorAll('.tl-checklist').forEach(ul=>{
+        const phase = ul.dataset.phase;
+        const items = ul.querySelectorAll('li');
+        items.forEach((li,i)=>{
+            const key = phase+'-'+i;
+            if(state[key]) li.classList.add('checked');
+            li.addEventListener('click',()=>{
+                li.classList.toggle('checked');
+                const s = loadTLState();
+                s[key] = li.classList.contains('checked');
+                saveTLState(s);
+            });
+        });
+    });
+}
+
+// ── QUOTES ──
+const quotes = [
+    {text:'人不是为失败而生的。一个人可以被毁灭，但不能被打败。',author:'\u2014\u2014 海明威 《老人与海》'},
+    {text:'世界上只有一种真正的英雄主义，就是认清了生活的真相后还依然热爱它。',author:'\u2014\u2014 罗曼\u00B7罗兰'},
+    {text:'当你穿过了暴风雨，你就不再是原来那个人了。',author:'\u2014\u2014 村上春树'},
+    {text:'所谓万丈深渊，下去，也是前程万里。',author:'\u2014\u2014 木心'},
+    {text:'黑夜给了我黑色的眼睛，我却用它寻找光明。',author:'\u2014\u2014 顾城'},
+    {text:'每一个不曾起舞的日子，都是对生命的辜负。',author:'\u2014\u2014 尼采'}
+];
+let quoteIdx = 0;
+const dotsContainer = document.getElementById('quoteDots');
+quotes.forEach((_, i) => { const d = document.createElement('div'); d.className = 'quote-dot'+(i===0?' active':''); d.onclick=()=>switchQuote(i); dotsContainer.appendChild(d); });
+function switchQuote(idx) {
+    quoteIdx = idx;
+    const qt = document.getElementById('quoteText'), qa = document.getElementById('quoteAuthor');
+    qt.style.opacity = qa.style.opacity = '0';
+    setTimeout(() => { qt.textContent = quotes[idx].text; qa.textContent = quotes[idx].author; qt.style.opacity = qa.style.opacity = '1'; }, 300);
+    dotsContainer.querySelectorAll('.quote-dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+}
+setInterval(()=>switchQuote((quoteIdx+1)%quotes.length), 6000);
+
+// PERSONAL TOOLKIT - API VERSION
+const API_BASE = '/api';
+let authToken = localStorage.getItem('restart_auth_token') || '';
+let currentUser = null;
+function authHeaders(){return {'Content-Type':'application/json','Authorization':authToken?'Bearer '+authToken:''}}
+async function api(path,options={}){const opts={...options,headers:{...authHeaders(),...(options.headers||{})}};const res=await fetch(API_BASE+path,opts);if(res.status===401){logout();throw new Error('未登录')}if(!res.ok){const err=await res.json().catch(()=>({detail:'请求失败'}));throw new Error(err.detail||'请求失败')}return res.status===204?null:res.json()}
+function openAuth(){document.getElementById('authOverlay').classList.add('show')}
+function closeAuth(){document.getElementById('authOverlay').classList.remove('show')}
+function switchAuthMode(mode){document.querySelectorAll('.auth-tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===mode));document.getElementById('loginForm').classList.toggle('active',mode==='login');document.getElementById('registerForm').classList.toggle('active',mode==='register');document.getElementById('authTitle').textContent=mode==='login'?'登录':'注册';document.getElementById('loginError').classList.remove('show');document.getElementById('registerError').classList.remove('show')}
+document.getElementById('authOverlay').addEventListener('click',function(e){if(e.target===this)closeAuth()});
+async function doLogin(){const email=document.getElementById('loginEmail').value.trim(),pwd=document.getElementById('loginPassword').value;const errEl=document.getElementById('loginError'),btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent='登录中...';errEl.classList.remove('show');try{const data=await api('/auth/login',{method:'POST',body:JSON.stringify({email,password:pwd})});authToken=data.access_token;currentUser=data.user;localStorage.setItem('restart_auth_token',authToken);updateAuthUI();closeAuth();showToast('success','欢迎回来，'+(data.user.nickname||data.user.email));tkInitAfterLogin()}catch(e){errEl.textContent=e.message;errEl.classList.add('show')}finally{btn.disabled=false;btn.textContent='登录'}}
+async function doRegister(){const email=document.getElementById('regEmail').value.trim(),pwd=document.getElementById('regPassword').value,nick=document.getElementById('regNickname').value.trim();const errEl=document.getElementById('registerError'),btn=document.getElementById('registerBtn');btn.disabled=true;btn.textContent='注册中...';errEl.classList.remove('show');try{const data=await api('/auth/register',{method:'POST',body:JSON.stringify({email,password:pwd,nickname:nick})});authToken=data.access_token;currentUser=data.user;localStorage.setItem('restart_auth_token',authToken);updateAuthUI();closeAuth();showToast('success','注册成功！欢迎加入');tkInitAfterLogin()}catch(e){errEl.textContent=e.message;errEl.classList.add('show')}finally{btn.disabled=false;btn.textContent='注册'}}
+function logout(){authToken='';currentUser=null;localStorage.removeItem('restart_auth_token');updateAuthUI();showToast('info','已退出登录');document.getElementById('tkGate').classList.add('show');document.getElementById('tkContent').classList.remove('show')}
+function updateAuthUI(){const loginBtn=document.getElementById('navLoginBtn'),userInfo=document.getElementById('navUserInfo');if(authToken&&currentUser){loginBtn.style.display='none';userInfo.style.display='flex';userInfo.classList.add('show');document.getElementById('navUserAvatar').textContent=(currentUser.nickname||currentUser.email)[0].toUpperCase();document.getElementById('navUserNickname').textContent=currentUser.nickname||currentUser.email}else{loginBtn.style.display='block';userInfo.style.display='none';userInfo.classList.remove('show')}}
+async function checkAuth(){if(!authToken){updateAuthUI();return}try{currentUser=await api('/auth/me');updateAuthUI();tkInitAfterLogin()}catch(e){logout()}}
+function tkToday(){return new Date().toISOString().slice(0,10)}
+function tkFmtDate(d){if(!d)return'--';var dt=new Date(d);return(dt.getMonth()+1)+'/'+dt.getDate()}
+var tkSelectedMood=0,tkJobFilter='all',tkTxnType='expense';
+let tkSettings={unemployment_start:null,monthly_budget:5000,savings:50000};
+function tkSwitch(tab){document.querySelectorAll('.toolkit-tab').forEach(t=>t.classList.toggle('active',t.dataset.tk===tab));document.querySelectorAll('.toolkit-panel').forEach(p=>p.classList.toggle('active',p.id==='tk-'+tab))}
+function tkInitAfterLogin(){document.getElementById('tkGate').classList.remove('show');document.getElementById('tkContent').classList.add('show');tkRenderMoodRow();tkLoadAll()}
+async function tkLoadAll(){try{await tkLoadSettings()}catch(e){}tkRenderDayCounter();tkRenderJobs();tkRenderDiaryList();tkRenderDiaryCheckin();tkRenderFinance();tkRenderSkills()}
+const TK_MOODS={1:'<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/><circle cx="12" cy="14" r="2" fill="#991B1B"/><circle cx="24" cy="14" r="2" fill="#991B1B"/><path d="M11 25 Q18 20 25 25" stroke="#991B1B" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',2:'<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" fill="#FFEDD5" stroke="#F97316" stroke-width="2"/><circle cx="12" cy="14" r="2" fill="#9A3412"/><circle cx="24" cy="14" r="2" fill="#9A3412"/><path d="M12 24 Q18 22 24 24" stroke="#9A3412" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',3:'<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" fill="#FEF3C7" stroke="#EAB308" stroke-width="2"/><circle cx="12" cy="14" r="2" fill="#854D0E"/><circle cx="24" cy="14" r="2" fill="#854D0E"/><line x1="12" y1="24" x2="24" y2="24" stroke="#854D0E" stroke-width="2" stroke-linecap="round"/></svg>',4:'<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" fill="#D1FAE5" stroke="#10B981" stroke-width="2"/><circle cx="12" cy="14" r="2" fill="#065F46"/><circle cx="24" cy="14" r="2" fill="#065F46"/><path d="M12 22 Q18 27 24 22" stroke="#065F46" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',5:'<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" fill="#A7F3D0" stroke="#059669" stroke-width="2"/><path d="M10 13 Q12 11 14 13" stroke="#064E3B" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M22 13 Q24 11 26 13" stroke="#064E3B" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M10 21 Q18 28 26 21" stroke="#064E3B" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>'};
+const TK_MOOD_LABELS={1:'很低落',2:'有点丧',3:'还凑合',4:'还不错',5:'充满希望'};
+function tkFilterJobs(f){tkJobFilter=f;document.querySelectorAll('#tkJobFilter .tk-chip').forEach(c=>c.classList.toggle('active',c.dataset.f===f));tkRenderJobs()}
+async function tkRenderJobs(){try{var stats=await api('/jobs/stats');document.getElementById('tkStatApply').textContent=stats['投递']||0;document.getElementById('tkStatInterview').textContent=(stats['面试']||0)+(stats['笔试']||0);document.getElementById('tkStatOffer').textContent=stats['Offer']||0;document.getElementById('tkStatReject').textContent=stats['拒绝']||0}catch(e){}try{var jobs=await api(tkJobFilter==='all'?'/jobs':'/jobs?status='+encodeURIComponent(tkJobFilter))}catch(e){return}var list=document.getElementById('tkJobList');if(!jobs.length){list.innerHTML='<div class="tk-empty"><svg class="ico"><use href="#i-briefcase"/></svg><div>还没有投递记录</div></div>';return}var bc={"投递":'b-blue',"笔试":'b-blue',"面试":'b-gold',Offer:'b-green',"拒绝":'b-red',"已放弃":'b-gray'};list.innerHTML=jobs.map(j=>'<div class="tk-card"><div class="tk-card-head"><div><div class="tk-card-title">'+j.company+'</div><div class="tk-card-sub">'+j.position+(j.salary?' · '+j.salary:'')+'</div></div><span class="tk-badge '+(bc[j.status]||'b-gray')+'">'+j.status+'</span></div><div class="tk-card-meta"><span>投递：'+tkFmtDate(j.apply_date)+'</span>'+(j.follow_date?'<span>跟进：'+tkFmtDate(j.follow_date)+'</span>':'')+'</div>'+(j.feedback?'<div class="tk-card-note">'+j.feedback+'</div>':'')+'<div class="tk-card-actions"><button class="tk-btn-sm tk-btn-edit" onclick="tkEditJob('+j.id+')">编辑</button><button class="tk-btn-sm tk-btn-del" onclick="tkDeleteJob('+j.id+')">删除</button></div></div>').join('')}
+function tkOpenJobModal(id){document.getElementById('tkJobModal').classList.add('show');if(id){api('/jobs').then(jobs=>{var j=jobs.find(x=>x.id===id);if(!j)return;document.getElementById('tkJobModalTitle').textContent='编辑投递';document.getElementById('tkJobId').value=j.id;document.getElementById('tkJobCompany').value=j.company||'';document.getElementById('tkJobPosition').value=j.position||'';document.getElementById('tkJobSalary').value=j.salary||'';document.getElementById('tkJobApplyDate').value=j.apply_date||'';document.getElementById('tkJobStatus').value=j.status||'投递';document.getElementById('tkJobFollowDate').value=j.follow_date||'';document.getElementById('tkJobFeedback').value=j.feedback||''})}else{document.getElementById('tkJobModalTitle').textContent='新增投递';document.getElementById('tkJobId').value='';document.getElementById('tkJobCompany').value='';document.getElementById('tkJobPosition').value='';document.getElementById('tkJobSalary').value='';document.getElementById('tkJobApplyDate').value=tkToday();document.getElementById('tkJobStatus').value='投递';document.getElementById('tkJobFollowDate').value='';document.getElementById('tkJobFeedback').value=''}}
+async function tkSaveJob(){var c=document.getElementById('tkJobCompany').value.trim(),p=document.getElementById('tkJobPosition').value.trim();if(!c||!p){showToast('error','请填写公司和职位');return}var body={company:c,position:p,salary:document.getElementById('tkJobSalary').value.trim(),status:document.getElementById('tkJobStatus').value,apply_date:document.getElementById('tkJobApplyDate').value||null,follow_date:document.getElementById('tkJobFollowDate').value||null,feedback:document.getElementById('tkJobFeedback').value.trim()};var id=document.getElementById('tkJobId').value;try{if(id){await api('/jobs/'+id,{method:'PUT',body:JSON.stringify(body)})}else{await api('/jobs',{method:'POST',body:JSON.stringify(body)})}tkCloseModal('tkJobModal');tkRenderJobs();showToast('success','保存成功')}catch(e){showToast('error',e.message)}}
+function tkEditJob(id){tkOpenJobModal(id)}
+async function tkDeleteJob(id){tkShowConfirm('删除投递记录','确定删除吗？',async()=>{try{await api('/jobs/'+id,{method:'DELETE'});tkRenderJobs()}catch(e){showToast('error',e.message)}})}
+function tkRenderMoodRow(){var c=document.getElementById('tkMoodRow');c.innerHTML='';for(var m=1;m<=5;m++){(function(m){var d=document.createElement('div');d.className='tk-mood';d.innerHTML=TK_MOODS[m]+'<span class="tk-mood-label">'+TK_MOOD_LABELS[m]+'</span>';d.onclick=function(){tkSelectedMood=m;c.querySelectorAll('.tk-mood').forEach(x=>x.classList.remove('selected'));d.classList.add('selected')};c.appendChild(d)})(m)}}
+async function tkLoadSettings(){try{tkSettings=await api('/settings')}catch(e){}}
+function tkRenderDayCounter(){var s=tkSettings;document.getElementById('tkUnempStart').value=s.unemployment_start||'';var days=s.unemployment_start?Math.floor((new Date(tkToday())-new Date(s.unemployment_start))/86400000)+1:0;document.getElementById('tkDayCount').textContent=days>0?days:0}
+async function tkSaveStartDate(){tkSettings.unemployment_start=document.getElementById('tkUnempStart').value;try{await api('/settings',{method:'PUT',body:JSON.stringify({unemployment_start:tkSettings.unemployment_start})});tkRenderDayCounter()}catch(e){showToast('error',e.message)}}
+async function tkSubmitDiary(){if(!tkSelectedMood){showToast('error','请先选择心情');return}var a=document.getElementById('tkAchievement').value.trim();try{await api('/diary',{method:'POST',body:JSON.stringify({entry_date:tkToday(),mood:tkSelectedMood,achievement:a})});tkRenderDiaryList();tkRenderDiaryCheckin();showToast('success','打卡成功！')}catch(e){showToast('error',e.message)}}
+async function tkRenderDiaryCheckin(){try{var diary=await api('/diary');var today=tkToday(),e=diary.find(x=>x.entry_date===today),btn=document.getElementById('tkCheckinBtn');if(e){btn.textContent='今日已打卡';btn.classList.add('done');tkSelectedMood=e.mood;var row=document.getElementById('tkMoodRow');row.querySelectorAll('.tk-mood').forEach((el,i)=>el.classList.toggle('selected',i+1===e.mood));document.getElementById('tkAchievement').value=e.achievement||''}else{btn.textContent='完成今日打卡';btn.classList.remove('done');tkSelectedMood=0}}catch(e){}}
+async function tkRenderDiaryList(){try{var d=await api('/diary')}catch(e){return}var list=document.getElementById('tkDiaryList');if(!d.length){list.innerHTML='<div class="tk-empty">还没有日记记录</div>';return}list.innerHTML=d.map(x=>'<div class="tk-card" style="padding:.6rem .8rem"><div style="display:flex;align-items:center;gap:.5rem"><div style="width:28px;height:28px;flex-shrink:0">'+TK_MOODS[x.mood]+'</div><div style="flex:1"><div style="font-size:.72rem;color:var(--text-muted)">'+x.entry_date.replace(/-/g,'/')+' · '+TK_MOOD_LABELS[x.mood]+'</div><div style="font-size:.82rem">'+(x.achievement||'今日打卡')+'</div></div><button class="tk-btn-sm tk-btn-del" onclick="tkDeleteDiary('+x.id+')">删除</button></div></div>').join('')}
+async function tkDeleteDiary(id){tkShowConfirm('删除日记','确定删除吗？',async()=>{try{await api('/diary/'+id,{method:'DELETE'});tkRenderDiaryList();tkRenderDiaryCheckin()}catch(e){showToast('error',e.message)}})}
+async function tkSaveSavings(){tkSettings.savings=parseFloat(document.getElementById('tkSavings').value)||0;try{await api('/settings',{method:'PUT',body:JSON.stringify({savings:tkSettings.savings})});tkRenderFinance()}catch(e){showToast('error',e.message)}}
+async function tkRenderFinance(){document.getElementById('tkSavings').value=tkSettings.savings||50000;try{var s=await api('/finance/summary');document.getElementById('tkMonthExp').textContent='¥'+s.month_expense.toLocaleString();document.getElementById('tkMonthInc').textContent='¥'+s.month_income.toLocaleString();var gap=s.month_expense-s.month_income;document.getElementById('tkSavingsMonths').textContent=gap>0?Math.floor(tkSettings.savings/gap):'∞'}catch(e){}try{var f=await api('/finance')}catch(e){return}var list=document.getElementById('tkTxnList');if(!f.length){list.innerHTML='<div class="tk-empty"><svg class="ico"><use href="#i-wallet"/></svg><div>还没有收支记录</div></div>';return}list.innerHTML=f.map(x=>'<div class="tk-txn-item"><div class="tk-txn-cat">'+x.category.slice(0,1)+'</div><div class="tk-txn-info"><div class="tk-txn-name">'+x.category+(x.note?' · '+x.note:'')+'</div><div class="tk-txn-date">'+x.txn_date.replace(/-/g,'/')+'</div></div><div class="tk-txn-amt '+(x.txn_type==='expense'?'expense':'income')+'">'+(x.txn_type==='expense'?'-':'+')+'¥'+x.amount.toLocaleString()+'</div><button class="tk-btn-sm tk-btn-del" onclick="tkDeleteTxn('+x.id+')">删除</button></div>').join('')}
+function tkSelectTxnType(t){tkTxnType=t;document.getElementById('tkTxnType').value=t;document.getElementById('tkTypeExp').classList.toggle('active',t==='expense');document.getElementById('tkTypeInc').classList.toggle('active',t==='income');var sel=document.getElementById('tkTxnCategory');if(t==='income'){sel.innerHTML='<option>薪资</option><option>失业金</option><option>兼职</option><option>退款</option><option>其他</option>'}else{sel.innerHTML='<option>住房</option><option>餐饮</option><option>交通</option><option>求职</option><option>学习</option><option>娱乐</option><option>医疗</option><option>其他</option>'}}
+function tkOpenFinanceModal(){document.getElementById('tkFinanceModal').classList.add('show');document.getElementById('tkTxnAmount').value='';document.getElementById('tkTxnDate').value=tkToday();document.getElementById('tkTxnNote').value='';tkSelectTxnType('expense')}
+async function tkSaveTxn(){var amt=parseFloat(document.getElementById('tkTxnAmount').value);if(!amt||amt<=0){showToast('error','请输入有效金额');return}var body={txn_type:document.getElementById('tkTxnType').value,amount:amt,category:document.getElementById('tkTxnCategory').value,txn_date:document.getElementById('tkTxnDate').value,note:document.getElementById('tkTxnNote').value.trim()};try{await api('/finance',{method:'POST',body:JSON.stringify(body)});tkCloseModal('tkFinanceModal');tkRenderFinance();showToast('success','保存成功')}catch(e){showToast('error',e.message)}}
+async function tkDeleteTxn(id){tkShowConfirm('删除记录','确定删除吗？',async()=>{try{await api('/finance/'+id,{method:'DELETE'});tkRenderFinance()}catch(e){showToast('error',e.message)}})}
+async function tkRenderSkills(){try{var skills=await api('/skills')}catch(e){return}var today=tkToday(),list=document.getElementById('tkSkillList');if(!skills.length){list.innerHTML='<div class="tk-empty"><svg class="ico"><use href="#i-target"/></svg><div>还没有学习计划</div></div>';return}list.innerHTML=skills.map(s=>{var pct=s.target_total>0?Math.min(100,Math.round(s.current_progress/s.target_total*100)):0;var checked=(s.checkins||[]).includes(today);var heat='';for(var i=13;i>=0;i--){var dd=new Date();dd.setDate(dd.getDate()-i);var dds=dd.toISOString().slice(0,10);var v=(s.checkins||[]).includes(dds);heat+='<div class="tk-heat-cell '+(v?'l'+Math.min(4,Math.ceil(s.streak/3)||1):'')+'"></div>'}return '<div class="tk-card"><div class="tk-card-head"><div><div class="tk-card-title">'+s.name+'</div><div class="tk-card-sub">'+s.skill_type+(s.daily_goal?' · '+s.daily_goal:'')+'</div></div><div style="display:flex;align-items:center;gap:.2rem;font-size:.78rem;color:var(--gold);font-weight:600"><svg class="ico" style="width:14px;height:14px"><use href="#i-fire"/></use>'+s.streak+'天</div></div>'+(s.target_total>0?'<div class="tk-skill-progress"><div class="tk-skill-fill" style="width:'+pct+'%"></div></div><div class="tk-skill-text"><span>'+s.current_progress+' / '+s.target_total+'</span><span>'+pct+'%</span></div>':'')+'<div class="tk-heat">'+heat+'</div><div class="tk-card-actions"><button class="tk-btn-sm" style="'+(checked?'background:rgba(74,154,96,.12);color:var(--green)':'background:rgba(201,152,46,.12);color:var(--gold)')+'" onclick="tkCheckinSkill('+s.id+')">'+(checked?'已打卡':'打卡')+'</button><button class="tk-btn-sm tk-btn-edit" onclick="tkEditSkill('+s.id+')">编辑</button><button class="tk-btn-sm tk-btn-del" onclick="tkDeleteSkill('+s.id+')">删除</button></div></div>'}).join('')}
+async function tkCheckinSkill(id){try{await api('/skills/'+id+'/checkin',{method:'POST'});tkRenderSkills()}catch(e){showToast('error',e.message)}}
+function tkOpenSkillModal(id){document.getElementById('tkSkillModal').classList.add('show');if(id){api('/skills').then(skills=>{var s=skills.find(x=>x.id===id);if(!s)return;document.getElementById('tkSkillModalTitle').textContent='编辑计划';document.getElementById('tkSkillId').value=s.id;document.getElementById('tkSkillName').value=s.name||'';document.getElementById('tkSkillType').value=s.skill_type||'其他';document.getElementById('tkSkillCurrent').value=s.current_progress||0;document.getElementById('tkSkillTarget').value=s.target_total||0;document.getElementById('tkSkillDailyGoal').value=s.daily_goal||''})}else{document.getElementById('tkSkillModalTitle').textContent='新增学习计划';document.getElementById('tkSkillId').value='';document.getElementById('tkSkillName').value='';document.getElementById('tkSkillType').value='刷题';document.getElementById('tkSkillCurrent').value='';document.getElementById('tkSkillTarget').value='';document.getElementById('tkSkillDailyGoal').value=''}}
+async function tkSaveSkill(){var n=document.getElementById('tkSkillName').value.trim();if(!n){showToast('error','请填写计划名称');return}var body={name:n,skill_type:document.getElementById('tkSkillType').value,current_progress:parseInt(document.getElementById('tkSkillCurrent').value)||0,target_total:parseInt(document.getElementById('tkSkillTarget').value)||0,daily_goal:document.getElementById('tkSkillDailyGoal').value.trim()};var id=document.getElementById('tkSkillId').value;try{if(id){await api('/skills/'+id,{method:'PUT',body:JSON.stringify(body)})}else{await api('/skills',{method:'POST',body:JSON.stringify(body)})}tkCloseModal('tkSkillModal');tkRenderSkills();showToast('success','保存成功')}catch(e){showToast('error',e.message)}}
+function tkEditSkill(id){tkOpenSkillModal(id)}
+async function tkDeleteSkill(id){tkShowConfirm('删除学习计划','确定删除吗？',async()=>{try{await api('/skills/'+id,{method:'DELETE'});tkRenderSkills()}catch(e){showToast('error',e.message)}})}
+function tkCloseModal(id){document.getElementById(id).classList.remove('show')}
+function tkShowConfirm(title,text,cb){document.getElementById('tkConfirmTitle').textContent=title;document.getElementById('tkConfirmText').textContent=text;document.getElementById('tkConfirmOverlay').classList.add('show');document.getElementById('tkConfirmYes').onclick=function(){tkCloseConfirm();cb()}}
+function tkCloseConfirm(){document.getElementById('tkConfirmOverlay').classList.remove('show')}
+document.querySelectorAll('.tk-modal-overlay').forEach(m=>m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('show')}));
+document.getElementById('tkConfirmOverlay').addEventListener('click',function(e){if(e.target===this)tkCloseConfirm()});
+checkAuth();
+
+// ── SKILL ASSESSMENT (localStorage) ──
+const ASSESS_KEY = 'restart_assess_answers';
+const assessQuestions = [
+    {q:'在过去的工作中，你最常被称赞的能力是？',opts:[{icon:'i-speech',text:'沟通协调',desc:'跨部门合作、谈判说服',trait:'communicate'},{icon:'i-chart',text:'分析思考',desc:'数据洞察、问题诊断',trait:'analytical'},{icon:'i-palette',text:'创意策划',desc:'方案设计、内容创作',trait:'creative'},{icon:'i-clipboard',text:'执行管理',desc:'项目推进、团队管理',trait:'manage'}]},
+    {q:'面对一个全新的任务，你通常会？',opts:[{icon:'i-search',text:'先调研分析',desc:'搜集信息、制定计划',trait:'analytical'},{icon:'i-users',text:'先找人讨论',desc:'请教专家、团队协作',trait:'communicate'},{icon:'i-rocket',text:'直接动手试',desc:'边做边学、快速迭代',trait:'creative'},{icon:'i-clipboard',text:'拆解成步骤',desc:'设里程碑、逐步推进',trait:'manage'}]},
+    {q:'如果让你选一项副业，你最想尝试？',opts:[{icon:'i-pen',text:'自媒体写作',desc:'分享观点、影响他人',trait:'creative'},{icon:'i-phone',text:'短视频运营',desc:'内容策划、粉丝运营',trait:'communicate'},{icon:'i-briefcase',text:'咨询顾问',desc:'专业建议、解决难题',trait:'analytical'},{icon:'i-store',text:'社区小店',desc:'选品管理、服务客户',trait:'manage'}]},
+    {q:'你的朋友最可能用哪个词形容你？',opts:[{icon:'i-target',text:'靠谱',desc:'说到做到，值得信赖',trait:'manage'},{icon:'i-lightbulb',text:'有想法',desc:'总能提出新点子',trait:'creative'},{icon:'i-handshake',text:'人缘好',desc:'善于沟通，让人舒服',trait:'communicate'},{icon:'i-microscope',text:'爱较真',desc:'刨根问底，追求准确',trait:'analytical'}]},
+    {q:'如果不考虑收入，你最想把时间花在？',opts:[{icon:'i-globe',text:'帮助他人',desc:'志愿服务、公益项目',trait:'communicate'},{icon:'i-books',text:'深入研究',desc:'某个领域的深度学习',trait:'analytical'},{icon:'i-palette',text:'创作表达',desc:'写作、设计、表演',trait:'creative'},{icon:'i-construction',text:'建造事物',desc:'从0到1做出项目',trait:'manage'}]}
+];
+let assessIdx = 0;
+let assessAnswers = [];
+(function loadAssess(){
+    try{
+        const saved = JSON.parse(localStorage.getItem(ASSESS_KEY));
+        if(Array.isArray(saved) && saved.length===5){
+            assessAnswers = saved;
+        }
+    }catch(e){}
+})();
+
+function renderAssess() {
+    if(assessAnswers.length===5 && assessIdx===0){
+        showAssessResult();
+        return;
+    }
+    const q = assessQuestions[assessIdx];
+    document.getElementById('assessQuestion').textContent = q.q;
+    document.getElementById('assessStepText').textContent = (assessIdx+1)+'/5';
+    document.getElementById('assessBarFill').style.width = (assessIdx/5*100)+'%';
+    document.getElementById('assessPrev').style.display = assessIdx>0?'inline-flex':'none';
+    document.getElementById('assessNext').textContent = assessIdx===4?'查看结果':'下一题';
+    const opts = document.getElementById('assessOptions'); opts.innerHTML = '';
+    q.opts.forEach((o,i) => {
+        const div = document.createElement('div');
+        div.className = 'assess-opt'+(assessAnswers[assessIdx]===i?' selected':'');
+        div.innerHTML = '<div class="opt-icon"><svg class="ico"><use href="#'+o.icon+'"/></svg></div><div class="opt-text">'+o.text+'</div><div class="opt-desc">'+o.desc+'</div>';
+        div.addEventListener('click', () => { assessAnswers[assessIdx]=i; opts.querySelectorAll('.assess-opt').forEach(d=>d.classList.remove('selected')); div.classList.add('selected'); });
+        opts.appendChild(div);
+    });
+}
+function assessNextQ() { if(assessAnswers[assessIdx]===undefined) return; if(assessIdx<4){assessIdx++;renderAssess();}else { try{localStorage.setItem(ASSESS_KEY,JSON.stringify(assessAnswers));}catch(e){} showAssessResult();} }
+function assessPrevQ() { if(assessIdx>0){assessIdx--;renderAssess();} }
+
+function drawRadar(traits, traitNames) {
+    const svg = document.getElementById('radarSvg');
+    const keys = Object.keys(traits);
+    const cx=140, cy=140, maxR=110;
+    const angleStep = (2*Math.PI)/keys.length;
+    const colors = {communicate:'#c4553a',analytical:'#3d7ab5',creative:'#c9982e',manage:'#4a9a60'};
+    let html = '';
+    for(let r=1;r<=4;r++) {
+        const points = keys.map((_,i)=>{const a=-Math.PI/2+i*angleStep; return (cx+Math.cos(a)*maxR*r/4)+','+(cy+Math.sin(a)*maxR*r/4);}).join(' ');
+        html += '<polygon points="'+points+'" fill="none" stroke="#e0d8cc" stroke-width="0.5" opacity="0.5"/>';
+    }
+    keys.forEach((_,i) => { const a=-Math.PI/2+i*angleStep; html+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+Math.cos(a)*maxR)+'" y2="'+(cy+Math.sin(a)*maxR)+'" stroke="#e0d8cc" stroke-width="0.5" opacity="0.3"/>'; });
+    const dataPoints = keys.map((k,i)=>{const a=-Math.PI/2+i*angleStep, r=(traits[k]/5)*maxR; return (cx+Math.cos(a)*r)+','+(cy+Math.sin(a)*r);}).join(' ');
+    html += '<polygon points="'+dataPoints+'" fill="rgba(196,85,58,0.15)" stroke="#c4553a" stroke-width="2"/>';
+    keys.forEach((k,i)=>{
+        const a=-Math.PI/2+i*angleStep, r=(traits[k]/5)*maxR;
+        html += '<circle cx="'+(cx+Math.cos(a)*r)+'" cy="'+(cy+Math.sin(a)*r)+'" r="4" fill="'+colors[k]+'" stroke="#fff" stroke-width="2"/>';
+        const lx = cx+Math.cos(a)*(maxR+22), ly = cy+Math.sin(a)*(maxR+22);
+        var shortName = traitNames[k].name.replace(/\u529b$/,'');
+        html += '<text x="'+lx+'" y="'+ly+'" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="600" fill="#7a7068">'+shortName+'</text>';
+    });
+    svg.innerHTML = html;
+}
+
+function showAssessResult() {
+    const traits = {communicate:0,analytical:0,creative:0,manage:0};
+    const traitNames = {
+        communicate:{name:'沟通社交力',icon:'i-speech',desc:'你善于与人沟通协调。适合：客户管理、销售、公关、社区运营、HR等岗位。',color:'#c4553a'},
+        analytical:{name:'分析洞察力',icon:'i-chart',desc:'你擅长深入分析和逻辑推理。适合：数据分析、市场调研、财务、质量管理等岗位。',color:'#3d7ab5'},
+        creative:{name:'创意表达力',icon:'i-palette',desc:'你拥有丰富的创意和表达能力。适合：内容运营、设计、文案策划、短视频制作等岗位。',color:'#c9982e'},
+        manage:{name:'执行管理力',icon:'i-target',desc:'你做事靠谱有条理。适合：项目管理、运营、供应链管理、创业等方向。',color:'#4a9a60'}
+    };
+    for(let i=0;i<assessAnswers.length;i++) traits[assessQuestions[i].opts[assessAnswers[i]].trait]++;
+    const sorted = Object.entries(traits).sort((a,b)=>b[1]-a[1]);
+    const total = sorted.reduce((s,[,v])=>s+v,0)||1;
+
+    document.getElementById('assessCard').style.display='none';
+    document.getElementById('assessProgress').style.display='none';
+    document.getElementById('assessResult').classList.add('show');
+
+    drawRadar(traits, traitNames);
+
+    const grid = document.getElementById('skillResultGrid'); grid.innerHTML='';
+    sorted.forEach(([key,val],idx)=>{
+        const t=traitNames[key], pct=Math.round(val/total*100);
+        const item=document.createElement('div');
+        item.className='skill-result-item';
+        item.style.cssText='opacity:0;animation:fadePanel .5s ease '+(idx*.15)+'s forwards';
+        item.innerHTML='<h4><svg class="ico"><use href="#'+t.icon+'"/></svg> '+t.name+' <span style="font-size:.75rem;color:var(--text-light);font-weight:400">'+pct+'%</span></h4><div class="skill-meter"><div class="skill-meter-fill" style="width:0%;background:'+t.color+'" data-target-width="'+pct+'%"></div></div><p style="margin-top:.6rem">'+t.desc+'</p>';
+        grid.appendChild(item);
+    });
+    setTimeout(()=>grid.querySelectorAll('.skill-meter-fill').forEach(f=>f.style.width=f.dataset.targetWidth),300);
+    showToast('success','技能画像已生成！');
+}
+function resetAssess(){
+    assessIdx=0;assessAnswers=[];
+    try{localStorage.removeItem(ASSESS_KEY);}catch(e){}
+    document.getElementById('assessCard').style.display='block';
+    document.getElementById('assessProgress').style.display='flex';
+    document.getElementById('assessResult').classList.remove('show');
+    renderAssess();
+}
+
+// ── CALCULATOR (localStorage) ──
+const CALC_KEY = 'restart_calc_inputs';
+function loadCalcInputs(){
+    try{
+        const saved = JSON.parse(localStorage.getItem(CALC_KEY));
+        if(saved){
+            document.getElementById('calc-savings').value = saved.savings ?? 80000;
+            document.getElementById('calc-expense').value = saved.expense ?? 8000;
+            document.getElementById('calc-benefit').value = saved.benefit ?? 1800;
+            document.getElementById('calc-other').value = saved.other ?? 0;
+        }
+    }catch(e){}
+}
+function saveCalcInputs(){
+    try{
+        localStorage.setItem(CALC_KEY, JSON.stringify({
+            savings: parseFloat(document.getElementById('calc-savings').value)||0,
+            expense: parseFloat(document.getElementById('calc-expense').value)||0,
+            benefit: parseFloat(document.getElementById('calc-benefit').value)||0,
+            other: parseFloat(document.getElementById('calc-other').value)||0
+        }));
+    }catch(e){}
+}
+function calculate(saveFlag) {
+    const savings=parseFloat(document.getElementById('calc-savings').value)||0;
+    const expense=parseFloat(document.getElementById('calc-expense').value)||0;
+    const benefit=parseFloat(document.getElementById('calc-benefit').value)||0;
+    const other=parseFloat(document.getElementById('calc-other').value)||0;
+    if(saveFlag) saveCalcInputs();
+    const gap=expense-benefit-other;
+    const months=gap>0?Math.floor(savings/gap):99;
+    const dm=Math.min(months,24);
+    const barW=Math.min((dm/24)*100,100);
+    document.getElementById('res-expense').textContent='-'+expense.toLocaleString()+' 元';
+    document.getElementById('res-benefit').textContent='+'+benefit.toLocaleString()+' 元';
+    document.getElementById('res-other').textContent='+'+other.toLocaleString()+' 元';
+    document.getElementById('res-gap').textContent=gap>0?'-'+gap.toLocaleString()+' 元':'收支有盈余';
+    const gapEl=document.getElementById('res-gap'), barEl=document.getElementById('res-bar'), advEl=document.getElementById('res-advice'), monthsEl=document.getElementById('res-months');
+    if(gap<=0){
+        gapEl.className='result-value safe'; monthsEl.textContent='收支平衡或有盈余';
+        barEl.style.width='100%'; barEl.style.background='linear-gradient(90deg,#4a9a60,#80d090)';
+        advEl.style.background='rgba(74,154,96,.15)';
+        advEl.innerHTML='太好了！你的被动收入已能覆盖支出。可以更从容地寻找理想工作。';
+    } else if(months>12){
+        monthsEl.textContent='约可支撑 '+months+' 个月'; barEl.style.width=barW+'%';
+        barEl.style.background='linear-gradient(90deg,#4a9a60,#c9982e)'; advEl.style.background='rgba(74,154,96,.1)';
+        advEl.innerHTML='跑道较充裕（约'+months+'个月）。建议控制支出，申领失业保险金延长跑道。';
+    } else if(months>3){
+        monthsEl.textContent='约可支撑 '+months+' 个月'; barEl.style.width=barW+'%';
+        barEl.style.background='linear-gradient(90deg,#c9982e,#e87f64)'; advEl.style.background='rgba(201,152,46,.1)';
+        advEl.innerHTML='需要积极行动。建议：①立即申领失业保险金；②削减非必要支出；③考虑兼职补充收入。';
+    } else {
+        monthsEl.textContent='仅可支撑 '+months+' 个月'; barEl.style.width=Math.max(barW,5)+'%';
+        barEl.style.background='linear-gradient(90deg,#e87f64,#c4553a)'; advEl.style.background='rgba(196,85,58,.1)';
+        advEl.innerHTML='财务紧张！请立即：①申领失业保险金和临时救助；②办理社保续缴；③寻找快速产生收入的机会。';
+    }
+}
+
+// ── NEWSLETTER ──
+function subscribeNewsletter() {
+    const email = document.getElementById('newsletterEmail').value;
+    if (email && email.includes('@')) {
+        showToast('success','订阅成功！每周一将为你发送就业简报。');
+        document.getElementById('newsletterEmail').value = '';
+    } else {
+        showToast('error','请输入有效的邮箱地址。');
+    }
+}
+
+// ── SMOOTH SCROLL ──
+document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+    const href = a.getAttribute('href');
+    if(href === '#') return;
+    const t = document.querySelector(href);
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}
+}));
+
+// ── INIT ──
+initTimeline();
+loadCalcInputs();
+calculate(false);
+renderAssess();
+</script>
+</body>
+</html>

@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>失业互助台</title>
+<style>
+/* ===== Reset & Base ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#FAFAF9;color:#1F2937;line-height:1.6;font-size:15px;padding-bottom:70px}
+:root{--amber:#F59E0B;--amber-dark:#D97706;--amber-light:#FEF3C7;--red:#EF4444;--red-light:#FEE2E2;--green:#10B981;--green-light:#D1FAE5;--gray:#6B7280;--gray-light:#F3F4F6;--border:#E5E7EB;--card:#FFFFFF}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit;font-size:16px;outline:none}
+a{color:var(--amber-dark);text-decoration:none}
+
+/* ===== Layout ===== */
+.container{max-width:900px;margin:0 auto;padding:0 16px}
+
+/* ===== Header ===== */
+.header{background:#fff;border-bottom:1px solid var(--border);padding:12px 0;position:sticky;top:0;z-index:100}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.header-title{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700;color:#1F2937}
+.header-title svg{width:24px;height:24px;flex-shrink:0}
+.header-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn-sm{padding:6px 12px;border-radius:8px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:4px;transition:.15s}
+.btn-sm svg{width:14px;height:14px}
+.btn-export{background:var(--amber-light);color:var(--amber-dark)}
+.btn-export:active{background:#FDE68A}
+.btn-import{background:var(--gray-light);color:#4B5563}
+.btn-import:active{background:#E5E7EB}
+
+/* ===== Backup Reminder ===== */
+.backup-reminder{background:#FFF7ED;border:1px solid #FDBA74;color:#9A3412;padding:10px 16px;font-size:13px;text-align:center;display:none}
+
+/* ===== Today Section ===== */
+.today-section{background:#fff;border-bottom:1px solid var(--border);padding:12px 0}
+.today-title{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#6B7280;margin-bottom:10px}
+.today-title svg{width:16px;height:16px}
+.today-list{display:flex;flex-direction:column;gap:6px}
+.today-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:14px}
+.today-item.overdue{background:var(--red-light);color:#991B1B}
+.today-item.today-task{background:var(--amber-light);color:#92400E}
+.today-item.reminder{background:#EFF6FF;color:#1E40AF}
+.today-item svg{width:16px;height:16px;flex-shrink:0}
+.today-item-text{flex:1;min-width:0}
+.today-item-action{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.today-item.overdue .today-item-action{background:var(--red);color:#fff}
+.today-item.today-task .today-item-action{background:var(--amber);color:#fff}
+.today-item.reminder .today-item-action{background:#3B82F6;color:#fff}
+.today-empty{text-align:center;color:var(--gray);font-size:13px;padding:8px}
+
+/* ===== Tab Navigation ===== */
+.tab-nav{display:flex;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:49px;z-index:99}
+.tab-item{flex:1;padding:10px 4px;text-align:center;font-size:13px;font-weight:500;color:var(--gray);border-bottom:2px solid transparent;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tab-item svg{width:20px;height:20px}
+.tab-item.active{color:var(--amber-dark);border-bottom-color:var(--amber)}
+
+/* ===== Module Sections ===== */
+.module{display:none;padding:16px 0}
+.module.active{display:block}
+.module-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.module-title{font-size:18px;font-weight:700}
+.btn-add{background:var(--amber);color:#fff;padding:8px 16px;border-radius:10px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:4px}
+.btn-add:active{background:var(--amber-dark)}
+.btn-add svg{width:16px;height:16px}
+
+/* ===== Cards ===== */
+.card{background:var(--card);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-title{font-size:15px;font-weight:600;margin-bottom:8px}
+
+/* ===== Stats Row ===== */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.stat-card{background:#fff;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat-num{font-size:22px;font-weight:700}
+.stat-label{font-size:11px;color:var(--gray);margin-top:2px}
+.stat-card.apply .stat-num{color:#3B82F6}
+.stat-card.interview .stat-num{color:var(--amber)}
+.stat-card.offer .stat-num{color:var(--green)}
+.stat-card.reject .stat-num{color:var(--red)}
+
+/* ===== Filter Chips ===== */
+.filter-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.chip{padding:5px 14px;border-radius:20px;font-size:13px;background:var(--gray-light);color:var(--gray);font-weight:500}
+.chip.active{background:var(--amber);color:#fff}
+
+/* ===== Job Card ===== */
+.job-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06);position:relative}
+.job-card-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:6px}
+.job-company{font-size:16px;font-weight:600}
+.job-position{font-size:13px;color:var(--gray)}
+.job-salary{font-size:13px;color:var(--amber-dark);font-weight:600}
+.status-badge{padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.status-投递{background:#DBEAFE;color:#1E40AF}
+.status-笔试{background:#E0E7FF;color:#3730A3}
+.status-面试{background:var(--amber-light);color:#92400E}
+.status-Offer{background:var(--green-light);color:#065F46}
+.status-拒绝{background:var(--red-light);color:#991B1B}
+.status-已放弃{background:var(--gray-light);color:#6B7280}
+.job-meta{display:flex;gap:12px;font-size:12px;color:var(--gray);margin-top:6px;flex-wrap:wrap}
+.job-meta span{display:flex;align-items:center;gap:3px}
+.job-meta svg{width:12px;height:12px}
+.job-feedback{margin-top:6px;padding:6px 10px;background:var(--gray-light);border-radius:6px;font-size:13px;color:#4B5563}
+.job-actions{display:flex;gap:6px;margin-top:8px}
+.job-actions button{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500}
+.btn-edit{background:#E0F2FE;color:#0369A1}
+.btn-del{background:var(--red-light);color:#991B1B}
+
+/* ===== Diary Module ===== */
+.day-counter{text-align:center;padding:24px 16px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:16px;margin-bottom:16px}
+.day-counter-num{font-size:42px;font-weight:800;color:var(--amber-dark);line-height:1}
+.day-counter-label{font-size:14px;color:#92400E;margin-top:4px}
+.day-counter-since{font-size:12px;color:#B45309;margin-top:6px}
+
+.quote-card{background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-radius:14px;padding:18px;margin-bottom:16px;text-align:center;border:1px solid #FED7AA}
+.quote-text{font-size:16px;font-weight:600;color:#9A3412;line-height:1.5}
+.quote-actions{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.btn-quote{padding:6px 16px;border-radius:8px;font-size:13px;font-weight:500}
+.btn-refresh{background:#fff;color:var(--amber-dark);border:1px solid #FDBA74}
+.btn-share{background:var(--amber);color:#fff}
+
+.mood-section{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.mood-label{font-size:14px;font-weight:600;margin-bottom:10px}
+.mood-options{display:flex;justify-content:space-around;gap:4px}
+.mood-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:10px;transition:.15s;min-width:44px}
+.mood-btn svg{width:32px;height:32px}
+.mood-btn-label{font-size:11px;color:var(--gray)}
+.mood-btn.selected{background:var(--amber-light)}
+.mood-btn.selected .mood-btn-label{color:var(--amber-dark);font-weight:600}
+.achievement-input{margin-top:12px;width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:15px}
+.achievement-input:focus{border-color:var(--amber)}
+.btn-checkin{width:100%;margin-top:10px;padding:10px;background:var(--amber);color:#fff;border-radius:10px;font-size:15px;font-weight:600}
+.btn-checkin:active{background:var(--amber-dark)}
+.btn-checkin.done{background:var(--green);color:#fff}
+
+.diary-list{margin-top:16px}
+.diary-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.diary-mood{width:32px;height:32px;flex-shrink:0}
+.diary-info{flex:1;min-width:0}
+.diary-date{font-size:12px;color:var(--gray)}
+.diary-achievement{font-size:14px}
+.diary-del{color:var(--gray);padding:4px}
+.diary-del svg{width:16px;height:16px}
+
+/* ===== Share Card Overlay ===== */
+.share-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px}
+.share-overlay.show{display:flex}
+.share-card{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:20px;padding:32px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.share-day{font-size:36px;font-weight:800;color:var(--amber-dark)}
+.share-day-label{font-size:13px;color:#92400E;margin-bottom:16px}
+.share-quote{font-size:17px;font-weight:600;color:#78350F;line-height:1.6;margin-bottom:16px}
+.share-date{font-size:12px;color:#B45309}
+.share-close{margin-top:16px;padding:8px 24px;border-radius:8px;background:#fff;color:var(--amber-dark);font-size:14px;font-weight:600}
+.share-tip{color:rgba(255,255,255,.8);font-size:12px;text-align:center;margin-top:12px}
+
+/* ===== Finance Module ===== */
+.finance-summary{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.finance-card{background:#fff;border-radius:12px;padding:16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.finance-card-label{font-size:12px;color:var(--gray);margin-bottom:4px}
+.finance-card-num{font-size:20px;font-weight:700}
+.finance-card-sub{font-size:11px;color:var(--gray);margin-top:4px}
+.finance-card.expense .finance-card-num{color:var(--red)}
+.finance-card.income .finance-card-num{color:var(--green)}
+.finance-card.savings .finance-card-num{color:var(--amber-dark)}
+
+.budget-ring-wrapper{display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.budget-ring{position:relative;width:140px;height:140px}
+.budget-ring svg{transform:rotate(-90deg)}
+.budget-ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.budget-ring-num{font-size:22px;font-weight:700}
+.budget-ring-label{font-size:11px;color:var(--gray)}
+
+.pie-section{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.pie-title{font-size:14px;font-weight:600;margin-bottom:12px}
+.pie-wrapper{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center}
+.pie-legend{display:flex;flex-direction:column;gap:6px}
+.pie-legend-item{display:flex;align-items:center;gap:6px;font-size:13px}
+.pie-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+.txn-list{margin-top:8px}
+.txn-item{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border)}
+.txn-cat{flex-shrink:0;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.txn-info{flex:1;min-width:0}
+.txn-cat-name{font-size:14px;font-weight:500}
+.txn-note{font-size:12px;color:var(--gray)}
+.txn-amount{font-weight:700;font-size:15px;flex-shrink:0}
+.txn-amount.expense{color:var(--red)}
+.txn-amount.income{color:var(--green)}
+.txn-del{padding:4px;color:var(--gray)}
+.txn-del svg{width:16px;height:16px}
+
+/* ===== Skills Module ===== */
+.skill-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.skill-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:8px}
+.skill-name{font-size:16px;font-weight:600}
+.skill-type{font-size:12px;color:var(--gray);margin-top:2px}
+.skill-streak{display:flex;align-items:center;gap:3px;font-size:13px;color:var(--amber-dark);font-weight:600}
+.skill-streak svg{width:14px;height:14px}
+.skill-progress-bar{height:8px;background:var(--gray-light);border-radius:4px;margin:8px 0;overflow:hidden}
+.skill-progress-fill{height:100%;background:var(--amber);border-radius:4px;transition:width .3s}
+.skill-progress-text{display:flex;justify-content:space-between;font-size:12px;color:var(--gray)}
+.skill-actions{display:flex;gap:6px;margin-top:8px}
+.btn-checkin-skill{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;background:var(--amber-light);color:var(--amber-dark)}
+.btn-checkin-skill.done{background:var(--green-light);color:#065F46}
+.btn-edit-skill{padding:6px 14px;border-radius:8px;font-size:13px;background:#E0F2FE;color:#0369A1}
+.btn-del-skill{padding:6px 14px;border-radius:8px;font-size:13px;background:var(--red-light);color:#991B1B}
+
+.skill-heatmap{margin-top:10px;display:flex;gap:3px;flex-wrap:wrap}
+.heat-cell{width:18px;height:18px;border-radius:3px;background:var(--gray-light)}
+.heat-cell.l1{background:#FDE68A}
+.heat-cell.l2{background:#FCD34D}
+.heat-cell.l3{background:#F59E0B}
+.heat-cell.l4{background:#D97706}
+
+/* ===== Modal ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;padding:20px;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px 16px 0 0;padding:20px;max-width:480px;width:100%;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;text-align:center}
+.form-group{margin-bottom:12px}
+.form-label{display:block;font-size:13px;color:var(--gray);margin-bottom:4px;font-weight:500}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:16px}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--amber)}
+.form-row{display:flex;gap:8px}
+.form-row .form-group{flex:1}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.btn-cancel{flex:1;padding:10px;border-radius:10px;background:var(--gray-light);color:var(--gray);font-size:15px;font-weight:600}
+.btn-save{flex:1;padding:10px;border-radius:10px;background:var(--amber);color:#fff;font-size:15px;font-weight:600}
+.btn-save:active{background:var(--amber-dark)}
+
+/* ===== Confirm Modal ===== */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;padding:20px;align-items:center;justify-content:center}
+.confirm-overlay.show{display:flex}
+.confirm-box{background:#fff;border-radius:16px;padding:24px;max-width:320px;width:100%;text-align:center}
+.confirm-title{font-size:16px;font-weight:600;margin-bottom:8px}
+.confirm-text{font-size:14px;color:var(--gray);margin-bottom:16px}
+.confirm-actions{display:flex;gap:8px}
+.confirm-actions button{flex:1;padding:10px;border-radius:10px;font-size:15px;font-weight:600}
+.btn-no{background:var(--gray-light);color:var(--gray)}
+.btn-yes{background:var(--red);color:#fff}
+
+/* ===== Empty State ===== */
+.empty{text-align:center;padding:32px 16px;color:var(--gray)}
+.empty svg{width:48px;height:48px;opacity:.3;margin-bottom:8px}
+.empty-text{font-size:14px}
+
+/* ===== Mobile Bottom Tab ===== */
+@media(min-width:768px){.tab-nav{position:sticky;top:49px}}
+
+@media(max-width:767px){
+  body{padding-bottom:64px}
+  .header-title{font-size:16px}
+  .header-title span{display:none}
+  .header-actions .btn-label{display:none}
+  .btn-sm{padding:6px 8px}
+  .tab-nav{display:none}
+  .mobile-tab{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+  .mobile-tab-item{flex:1;padding:8px 4px;text-align:center;font-size:11px;color:var(--gray);display:flex;flex-direction:column;align-items:center;gap:2px}
+  .mobile-tab-item svg{width:22px;height:22px}
+  .mobile-tab-item.active{color:var(--amber-dark)}
+  .module{padding:12px 0}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .finance-summary{grid-template-columns:1fr}
+  .day-counter-num{font-size:36px}
+  .modal{border-radius:16px 16px 0 0}
+}
+.mobile-tab{display:none}
+
+/* Settings inline */
+.settings-inline{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.settings-inline-title{font-size:14px;font-weight:600;margin-bottom:10px}
+.settings-inline-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.settings-inline-row label{font-size:13px;color:var(--gray);min-width:90px}
+.settings-inline-row input{flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<div class="header">
+  <div class="container header-inner">
+    <div class="header-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <span>失业互助台</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-sm btn-export" onclick="exportJSON()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="btn-label">导出备份</span>
+      </button>
+      <button class="btn-sm btn-import" onclick="document.getElementById('importFile').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span class="btn-label">导入恢复</span>
+      </button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+    </div>
+  </div>
+</div>
+
+<!-- ===== Backup Reminder ===== -->
+<div class="backup-reminder" id="backupReminder"></div>
+
+<!-- ===== Today Section ===== -->
+<div class="today-section">
+  <div class="container">
+    <div class="today-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>今天要处理</span>
+    </div>
+    <div class="today-list" id="todayList"></div>
+  </div>
+</div>
+
+<!-- ===== Tab Navigation (Desktop) ===== -->
+<div class="tab-nav">
+  <button class="tab-item active" data-tab="jobs" onclick="switchTab('jobs')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    求职进度
+  </button>
+  <button class="tab-item" data-tab="diary" onclick="switchTab('diary')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    失业日记
+  </button>
+  <button class="tab-item" data-tab="finance" onclick="switchTab('finance')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+    财务精算
+  </button>
+  <button class="tab-item" data-tab="skills" onclick="switchTab('skills')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    技能充电
+  </button>
+</div>
+
+<!-- ===== Mobile Tab Bar ===== -->
+<div class="mobile-tab">
+  <button class="mobile-tab-item active" data-mtab="jobs" onclick="switchTab('jobs')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    求职
+  </button>
+  <button class="mobile-tab-item" data-mtab="diary" onclick="switchTab('diary')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    日记
+  </button>
+  <button class="mobile-tab-item" data-mtab="finance" onclick="switchTab('finance')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+    财务
+  </button>
+  <button class="mobile-tab-item" data-mtab="skills" onclick="switchTab('skills')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    充电
+  </button>
+</div>
+
+<!-- ===== Main Content ===== -->
+<div class="container">
+
+  <!-- ===== Jobs Module ===== -->
+  <div class="module active" id="module-jobs">
+    <div class="settings-inline">
+      <div class="settings-inline-title">求职统计</div>
+      <div class="stats-row" style="margin-bottom:0">
+        <div class="stat-card apply"><div class="stat-num" id="statApply">0</div><div class="stat-label">已投递</div></div>
+        <div class="stat-card interview"><div class="stat-num" id="statInterview">0</div><div class="stat-label">面试中</div></div>
+        <div class="stat-card offer"><div class="stat-num" id="statOffer">0</div><div class="stat-label">Offer</div></div>
+        <div class="stat-card reject"><div class="stat-num" id="statReject">0</div><div class="stat-label">被拒</div></div>
+      </div>
+    </div>
+    <div class="module-header">
+      <div class="module-title">求职进度</div>
+      <button class="btn-add" onclick="openJobModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新增投递
+      </button>
+    </div>
+    <div class="filter-row" id="jobFilterRow">
+      <button class="chip active" data-filter="全部" onclick="filterJobs('全部')">全部</button>
+      <button class="chip" data-filter="投递" onclick="filterJobs('投递')">投递</button>
+      <button class="chip" data-filter="笔试" onclick="filterJobs('笔试')">笔试</button>
+      <button class="chip" data-filter="面试" onclick="filterJobs('面试')">面试</button>
+      <button class="chip" data-filter="Offer" onclick="filterJobs('Offer')">Offer</button>
+      <button class="chip" data-filter="拒绝" onclick="filterJobs('拒绝')">拒绝</button>
+    </div>
+    <div id="jobList"></div>
+  </div>
+
+  <!-- ===== Diary Module ===== -->
+  <div class="module" id="module-diary">
+    <div class="day-counter">
+      <div class="day-counter-num" id="dayCount">0</div>
+      <div class="day-counter-label">失业第 N 天</div>
+      <div class="day-counter-since" id="daySince"></div>
+    </div>
+
+    <div class="settings-inline">
+      <div class="settings-inline-title">失业起始设置</div>
+      <div class="settings-inline-row">
+        <label>起始日期</label>
+        <input type="date" id="unemploymentStart" onchange="saveStartDate()">
+      </div>
+    </div>
+
+    <div class="quote-card">
+      <div class="quote-text" id="quoteText">加载中...</div>
+      <div class="quote-actions">
+        <button class="btn-quote btn-refresh" onclick="refreshQuote()">换一句</button>
+        <button class="btn-quote btn-share" onclick="showShareCard()">生成打气卡</button>
+      </div>
+    </div>
+
+    <div class="mood-section">
+      <div class="mood-label">今日心情打卡</div>
+      <div class="mood-options" id="moodOptions"></div>
+      <input type="text" class="achievement-input" id="achievementInput" placeholder="今天的小成就（投了简历？学了新东西？）">
+      <button class="btn-checkin" id="checkinBtn" onclick="submitDiary()">完成今日打卡</button>
+    </div>
+
+    <div class="module-header"><div class="module-title">日记记录</div></div>
+    <div class="diary-list" id="diaryList"></div>
+  </div>
+
+  <!-- ===== Finance Module ===== -->
+  <div class="module" id="module-finance">
+    <div class="settings-inline">
+      <div class="settings-inline-title">预算设置</div>
+      <div class="settings-inline-row">
+        <label>月预算 (¥)</label>
+        <input type="number" id="monthlyBudget" value="5000" onchange="saveBudget()">
+      </div>
+      <div class="settings-inline-row">
+        <label>存款余额 (¥)</label>
+        <input type="number" id="savingsAmount" value="50000" onchange="saveSavings()">
+      </div>
+    </div>
+
+    <div class="finance-summary">
+      <div class="finance-card expense">
+        <div class="finance-card-label">本月支出</div>
+        <div class="finance-card-num" id="monthExpense">¥0</div>
+        <div class="finance-card-sub" id="monthExpenseSub">预算 ¥5000</div>
+      </div>
+      <div class="finance-card income">
+        <div class="finance-card-label">本月收入</div>
+        <div class="finance-card-num" id="monthIncome">¥0</div>
+        <div class="finance-card-sub">失业保障金等</div>
+      </div>
+    </div>
+
+    <div class="pie-section">
+      <div class="pie-title">本月支出分布</div>
+      <div class="pie-wrapper">
+        <svg width="120" height="120" viewBox="0 0 120 120" id="expensePie">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#F3F4F6" stroke-width="20"/>
+        </svg>
+        <div class="pie-legend" id="pieLegend"></div>
+      </div>
+    </div>
+
+    <div class="finance-card savings" style="text-align:center;margin-bottom:16px">
+      <div class="finance-card-label">存款还能撑</div>
+      <div class="finance-card-num" id="savingsMonths">--</div>
+      <div class="finance-card-sub">个月（按本月支出速率）</div>
+    </div>
+
+    <div class="module-header">
+      <div class="module-title">收支记录</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm btn-import" onclick="exportCSV()" style="background:#E0F2FE;color:#0369A1">导出CSV</button>
+        <button class="btn-add" onclick="openFinanceModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          记一笔
+        </button>
+      </div>
+    </div>
+    <div class="txn-list" id="txnList"></div>
+  </div>
+
+  <!-- ===== Skills Module ===== -->
+  <div class="module" id="module-skills">
+    <div class="module-header">
+      <div class="module-title">技能充电计划</div>
+      <button class="btn-add" onclick="openSkillModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新增计划
+      </button>
+    </div>
+    <div id="skillList"></div>
+  </div>
+
+</div>
+
+<!-- ===== Job Modal ===== -->
+<div class="modal-overlay" id="jobModal">
+  <div class="modal">
+    <div class="modal-title" id="jobModalTitle">新增投递</div>
+    <input type="hidden" id="jobId">
+    <div class="form-group">
+      <label class="form-label">公司名称 *</label>
+      <input type="text" class="form-input" id="jobCompany" placeholder="如：腾讯">
+    </div>
+    <div class="form-group">
+      <label class="form-label">职位名称 *</label>
+      <input type="text" class="form-input" id="jobPosition" placeholder="如：后端开发工程师">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">薪资范围</label>
+        <input type="text" class="form-input" id="jobSalary" placeholder="如：20-30k">
+      </div>
+      <div class="form-group">
+        <label class="form-label">投递日期</label>
+        <input type="date" class="form-input" id="jobApplyDate">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">当前状态</label>
+        <select class="form-select" id="jobStatus">
+          <option value="投递">投递</option>
+          <option value="笔试">笔试</option>
+          <option value="面试">面试</option>
+          <option value="Offer">Offer</option>
+          <option value="拒绝">拒绝</option>
+          <option value="已放弃">已放弃</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">面试/跟进日期</label>
+        <input type="date" class="form-input" id="jobFollowDate">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">面试反馈/备注</label>
+      <textarea class="form-textarea" id="jobFeedback" rows="3" placeholder="如：技术面通过，等HR面通知"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('jobModal')">取消</button>
+      <button class="btn-save" onclick="saveJob()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Finance Modal ===== -->
+<div class="modal-overlay" id="financeModal">
+  <div class="modal">
+    <div class="modal-title">记一笔</div>
+    <div class="form-group">
+      <label class="form-label">类型</label>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="chip active" id="typeExpense" onclick="selectTxnType('expense')">支出</button>
+        <button type="button" class="chip" id="typeIncome" onclick="selectTxnType('income')">收入</button>
+      </div>
+    </div>
+    <input type="hidden" id="txnType" value="expense">
+    <div class="form-group">
+      <label class="form-label">金额 (¥) *</label>
+      <input type="number" class="form-input" id="txnAmount" placeholder="如：3500">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">分类</label>
+        <select class="form-select" id="txnCategory">
+          <option value="住房">住房</option>
+          <option value="餐饮">餐饮</option>
+          <option value="交通">交通</option>
+          <option value="求职">求职</option>
+          <option value="学习">学习</option>
+          <option value="娱乐">娱乐</option>
+          <option value="医疗">医疗</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">日期</label>
+        <input type="date" class="form-input" id="txnDate">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">备注</label>
+      <input type="text" class="form-input" id="txnNote" placeholder="如：七月房租">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('financeModal')">取消</button>
+      <button class="btn-save" onclick="saveTxn()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Skill Modal ===== -->
+<div class="modal-overlay" id="skillModal">
+  <div class="modal">
+    <div class="modal-title" id="skillModalTitle">新增学习计划</div>
+    <input type="hidden" id="skillId">
+    <div class="form-group">
+      <label class="form-label">计划名称 *</label>
+      <input type="text" class="form-input" id="skillName" placeholder="如：LeetCode刷题">
+    </div>
+    <div class="form-group">
+      <label class="form-label">类型</label>
+      <select class="form-select" id="skillType">
+        <option value="刷题">刷题</option>
+        <option value="技术学习">技术学习</option>
+        <option value="语言">语言</option>
+        <option value="证书">证书备考</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">当前进度</label>
+        <input type="number" class="form-input" id="skillCurrent" placeholder="如：45">
+      </div>
+      <div class="form-group">
+        <label class="form-label">目标总量</label>
+        <input type="number" class="form-input" id="skillTarget" placeholder="如：150">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">每日目标描述</label>
+      <input type="text" class="form-input" id="skillDailyGoal" placeholder="如：每天3题">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('skillModal')">取消</button>
+      <button class="btn-save" onclick="saveSkill()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Confirm Modal ===== -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirmTitle">确认操作</div>
+    <div class="confirm-text" id="confirmText"></div>
+    <div class="confirm-actions">
+      <button class="btn-no" onclick="closeConfirm()">取消</button>
+      <button class="btn-yes" id="confirmYes">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Share Card Overlay ===== -->
+<div class="share-overlay" id="shareOverlay">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:340px">
+    <div class="share-card">
+      <div class="share-day" id="shareDay">0</div>
+      <div class="share-day-label">失业第 N 天</div>
+      <div class="share-quote" id="shareQuote"></div>
+      <div class="share-date" id="shareDate"></div>
+    </div>
+    <div class="share-tip">截图保存，分享给同样在路上的朋友</div>
+    <button class="share-close" onclick="closeShare()">关闭</button>
+  </div>
+</div>
+
+<script>
+/* ===== SVG Icon Paths ===== */
+const ICONS = {
+  calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  fire:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+  empty:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
+};
+
+/* ===== Mood SVG Faces ===== */
+const MOOD_SVGS = {
+  1:'<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/><circle cx="12" cy="14" r="2" fill="#991B1B"/><circle cx="24" cy="14" r="2" fill="#991B1B"/><path d="M11 25 Q18 20 25 25" stroke="#991B1B" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M9 11 Q12 9 15 11" stroke="#991B1B" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M21 11 Q24 9 27 11" stroke="#991B1B" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>',
+  2:'<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" fill="#FFEDD5" stroke="#F97316" stroke-width="2"/><circle cx="12" cy="14" r="2" fill="#9A3412"/><circle cx="24" cy="14" r="2" fill="#9A3412"/><path d="M12 24 Q18 22 24 24" stroke="#9A3412" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+  3:'<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" fill="#FEF3C7" stroke="#EAB308" stroke-width="2"/><circle cx="12" cy="14" r="2" fill="#854D0E"/><circle cx="24" cy="14" r="2" fill="#854D0E"/><line x1="12" y1="24" x2="24" y2="24" stroke="#854D0E" stroke-width="2" stroke-linecap="round"/></svg>',
+  4:'<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" fill="#D1FAE5" stroke="#10B981" stroke-width="2"/><circle cx="12" cy="14" r="2" fill="#065F46"/><circle cx="24" cy="14" r="2" fill="#065F46"/><path d="M12 22 Q18 27 24 22" stroke="#065F46" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+  5:'<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" fill="#A7F3D0" stroke="#059669" stroke-width="2"/><path d="M10 13 Q12 11 14 13" stroke="#064E3B" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M22 13 Q24 11 26 13" stroke="#064E3B" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M10 21 Q18 28 26 21" stroke="#064E3B" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>'
+};
+const MOOD_LABELS = {1:'很低落',2:'有点丧',3:'还凑合',4:'还不错',5:'充满希望'};
+
+/* ===== Encouraging Quotes ===== */
+const QUOTES = [
+  '失业不是终点，是重新认识自己的起点。',
+  '每一次面试失败，都是在帮你筛掉不合适的工作。',
+  '你不是在找工作，你是在找一段值得投入的人生。',
+  '失业的每一天都在教你：什么才是真正重要的。',
+  '投出去的简历没有白投的，每一份都在增加你的运气。',
+  '别人看到的是失业，你看到的是属于自己的 Gap Month。',
+  '焦虑不会让面试更快通过，行动才会。',
+  '今天的你比昨天多投了一份简历，这就够了。',
+  '失业不是你不够好，是时机还没对上。',
+  '保持节奏，比保持乐观更重要。',
+  '面试被拒不是否定你这个人，只是这次没对上频率。',
+  '找工作像相亲，急不得，将就更不得。',
+  '每一次被拒绝，都在帮你积攒「终于等到你」的momentum。',
+  '失业期的自律，比上班时更值钱。',
+  '低谷期是用来扎根的，不是用来躺平的。'
+];
+
+/* ===== Category Icons (SVG simplified as colored bg + text) ===== */
+const CAT_EMOJI_MAP = {
+  '住房':'#FEE2E2','餐饮':'#FFEDD5','交通':'#DBEAFE','求职':'#F3E8FF',
+  '学习':'#D1FAE5','娱乐':'#FEF3C7','医疗':'#FCE7F3','其他':'#F3F4F6',
+  '薪资':'#D1FAE5','失业金':'#D1FAE5','兼职':'#D1FAE5','退款':'#D1FAE5'
+};
+
+/* ===== Storage Keys ===== */
+const PREFIX = 'wb_unemployment_';
+const KEYS = {
+  jobs: PREFIX+'jobs',
+  diary: PREFIX+'diary',
+  finance: PREFIX+'finance',
+  skills: PREFIX+'skills',
+  settings: PREFIX+'settings'
+};
+
+/* ===== Storage Helpers ===== */
+function getData(key){
+  try{ return JSON.parse(localStorage.getItem(key)) || []; }catch(e){ return []; }
+}
+function setData(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+function getSettings(){
+  try{
+    let s = JSON.parse(localStorage.getItem(KEYS.settings));
+    if(!s) s = {};
+    if(!s.unemploymentStart) s.unemploymentStart = '2026-07-01';
+    if(!s.monthlyBudget) s.monthlyBudget = 5000;
+    if(!s.savings) s.savings = 50000;
+    return s;
+  }catch(e){ return {unemploymentStart:'2026-07-01',monthlyBudget:5000,savings:50000}; }
+}
+function saveSettings(){ setData(KEYS.settings, getSettings()); }
+
+/* ===== Date Helpers ===== */
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function fmtDate(d){ if(!d) return '--'; const dt = new Date(d); return (dt.getMonth()+1)+'月'+dt.getDate()+'日'; }
+function fmtDateFull(d){ if(!d) return '--'; return d.replace(/-/g,'/'); }
+function daysBetween(d1,d2){ const diff = new Date(d2) - new Date(d1); return Math.floor(diff/86400000); }
+function getMonthStr(d){ return d.slice(0,7); }
+
+/* ===== ID Generator ===== */
+function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+/* ===== Sample Data ===== */
+function initSampleData(){
+  const today = todayStr();
+  const samples = {
+    jobs: [
+      {id:genId(),company:'腾讯',position:'后端开发工程师',salary:'25-35k',applyDate:'2026-07-15',status:'面试',followDate:today,feedback:'技术面通过，今天下午2点HR面'},
+      {id:genId(),company:'字节跳动',position:'大数据开发工程师',salary:'22-32k',applyDate:'2026-07-20',status:'笔试',followDate:'2026-07-28',feedback:'笔试已完成，等通知中（已超期未跟进）'},
+      {id:genId(),company:'阿里巴巴',position:'数据工程师',salary:'20-30k',applyDate:'2026-07-10',status:'拒绝',followDate:'',feedback:'简历未通过筛选'},
+      {id:genId(),company:'美团',position:'后端开发',salary:'18-28k',applyDate:'2026-07-25',status:'投递',followDate:'',feedback:''},
+      {id:genId(),company:'拼多多',position:'算法工程师',salary:'30-45k',applyDate:'2026-07-28',status:'面试',followDate:'2026-08-04',feedback:'一面技术面已过，二面待安排'}
+    ],
+    diary: [
+      {id:genId(),date:'2026-07-01',mood:2,achievement:'更新了简历，整理了项目经历'},
+      {id:genId(),date:'2026-07-15',mood:3,achievement:'投出5份简历，包括腾讯字节'},
+      {id:genId(),date:'2026-08-01',mood:4,achievement:'腾讯技术面感觉不错，等HR面通知'}
+    ],
+    finance: [
+      {id:genId(),date:'2026-07-01',type:'income',amount:8000,category:'薪资',note:'七月工资结算'},
+      {id:genId(),date:'2026-07-05',type:'expense',amount:3500,category:'住房',note:'七月房租'},
+      {id:genId(),date:'2026-07-10',type:'expense',amount:800,category:'餐饮',note:'上周外卖'},
+      {id:genId(),date:'2026-07-15',type:'expense',amount:200,category:'求职',note:'简历打印+地铁'},
+      {id:genId(),date:'2026-08-01',type:'expense',amount:3500,category:'住房',note:'八月房租'}
+    ],
+    skills: [
+      {id:genId(),name:'LeetCode刷题',type:'刷题',current:45,target:150,dailyGoal:'每天3题',checkins:{'2026-07-28':1,'2026-07-29':1,'2026-07-30':1,'2026-07-31':1,'2026-08-01':1}},
+      {id:genId(),name:'Hadoop生态深入学习',type:'技术学习',current:60,target:100,dailyGoal:'每天1小时',checkins:{'2026-07-30':1,'2026-07-31':1,'2026-08-01':1}},
+      {id:genId(),name:'英语口语练习',type:'语言',current:0,target:0,dailyGoal:'每天30分钟',checkins:{'2026-07-26':1,'2026-07-27':1,'2026-07-28':1,'2026-07-29':1,'2026-07-30':1,'2026-07-31':1,'2026-08-01':1}}
+    ],
+    settings: {unemploymentStart:'2026-07-01',monthlyBudget:5000,savings:50000}
+  };
+  Object.keys(KEYS).forEach(k=>{
+    if(!localStorage.getItem(KEYS[k])){
+      setData(KEYS[k], samples[k]);
+    }
+  });
+}
+
+/* ===== Tab Navigation ===== */
+function switchTab(tab){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  document.getElementById('module-'+tab).classList.add('active');
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  document.querySelectorAll('.mobile-tab-item').forEach(t=>t.classList.toggle('active', t.dataset.mtab===tab));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ===== Today Section ===== */
+function renderToday(){
+  const today = todayStr();
+  const list = document.getElementById('todayList');
+  const items = [];
+
+  // Jobs: overdue follow-ups
+  const jobs = getData(KEYS.jobs);
+  jobs.forEach(j=>{
+    if(['面试','笔试'].includes(j.status) && j.followDate && j.followDate < today){
+      items.push({type:'overdue',text:`${j.company} - ${j.position}：跟进已超期（${fmtDate(j.followDate)}）`,action:'去跟进',onclick:`switchTab('jobs')`});
+    }
+    if(j.status==='面试' && j.followDate === today){
+      items.push({type:'today-task',text:`${j.company} - ${j.position}：今天有面试/跟进`,action:'查看',onclick:`switchTab('jobs')`});
+    }
+  });
+
+  // Diary: not checked in today
+  const diary = getData(KEYS.diary);
+  if(!diary.find(d=>d.date===today)){
+    items.push({type:'reminder',text:'今日日记还未打卡',action:'去打卡',onclick:`switchTab('diary')`});
+  }
+
+  // Skills: not checked in today
+  const skills = getData(KEYS.skills);
+  skills.forEach(s=>{
+    if(s.checkins && !s.checkins[today]){
+      items.push({type:'reminder',text:`「${s.name}」今日未打卡`,action:'去打卡',onclick:`switchTab('skills')`});
+    }
+  });
+
+  // Finance: budget warning
+  const settings = getSettings();
+  const finance = getData(KEYS.finance);
+  const monthStr = getMonthStr(today);
+  const monthExpense = finance.filter(f=>f.type==='expense'&&getMonthStr(f.date)===monthStr).reduce((s,f)=>s+f.amount,0);
+  if(monthExpense > settings.monthlyBudget){
+    items.push({type:'overdue',text:`本月支出 ¥${monthExpense} 已超出预算 ¥${settings.monthlyBudget}`,action:'查看',onclick:`switchTab('finance')`});
+  }
+
+  if(items.length===0){
+    list.innerHTML = '<div class="today-empty">今天没有待处理的事项，保持节奏！</div>';
+  } else {
+    list.innerHTML = items.map(it=>`
+      <div class="today-item ${it.type}">
+        ${it.type==='overdue'?ICONS.alert:it.type==='today-task'?ICONS.bell:ICONS.calendar}
+        <span class="today-item-text">${it.text}</span>
+        <button class="today-item-action" onclick="${it.onclick}">${it.action}</button>
+      </div>
+    `).join('');
+  }
+}
+
+/* ===== Jobs Module ===== */
+let jobFilter = '全部';
+function filterJobs(f){
+  jobFilter = f;
+  document.querySelectorAll('#jobFilterRow .chip').forEach(c=>c.classList.toggle('active',c.dataset.filter===f));
+  renderJobs();
+}
+function renderJobs(){
+  const jobs = getData(KEYS.jobs);
+  // Stats
+  document.getElementById('statApply').textContent = jobs.filter(j=>j.status==='投递').length;
+  document.getElementById('statInterview').textContent = jobs.filter(j=>['面试','笔试'].includes(j.status)).length;
+  document.getElementById('statOffer').textContent = jobs.filter(j=>j.status==='Offer').length;
+  document.getElementById('statReject').textContent = jobs.filter(j=>j.status==='拒绝').length;
+
+  // List
+  const filtered = jobFilter==='全部' ? jobs : jobs.filter(j=>j.status===jobFilter);
+  const list = document.getElementById('jobList');
+  if(filtered.length===0){
+    list.innerHTML = `<div class="empty">${ICONS.empty}<div class="empty-text">还没有投递记录，点击「新增投递」开始</div></div>`;
+    return;
+  }
+  // Sort by applyDate desc
+  filtered.sort((a,b)=>(b.applyDate||'').localeCompare(a.applyDate||''));
+  list.innerHTML = filtered.map(j=>`
+    <div class="job-card">
+      <div class="job-card-header">
+        <div>
+          <div class="job-company">${j.company}</div>
+          <div class="job-position">${j.position}</div>
+        </div>
+        <div style="text-align:right">
+          <span class="status-badge status-${j.status}">${j.status}</span>
+          ${j.salary?`<div class="job-salary" style="margin-top:4px">${j.salary}</div>`:''}
+        </div>
+      </div>
+      <div class="job-meta">
+        <span>${ICONS.calendar} 投递：${fmtDate(j.applyDate)}</span>
+        ${j.followDate?`<span>${ICONS.calendar} 跟进：${fmtDate(j.followDate)}</span>`:''}
+      </div>
+      ${j.feedback?`<div class="job-feedback">${j.feedback}</div>`:''}
+      <div class="job-actions">
+        <button class="btn-edit" onclick="editJob('${j.id}')">编辑</button>
+        <button class="btn-del" onclick="deleteJob('${j.id}')">删除</button>
+      </div>
+    </div>
+  `).join('');
+}
+function openJobModal(id){
+  document.getElementById('jobModal').classList.add('show');
+  if(id){
+    const jobs = getData(KEYS.jobs);
+    const j = jobs.find(x=>x.id===id);
+    if(!j) return;
+    document.getElementById('jobModalTitle').textContent = '编辑投递';
+    document.getElementById('jobId').value = j.id;
+    document.getElementById('jobCompany').value = j.company||'';
+    document.getElementById('jobPosition').value = j.position||'';
+    document.getElementById('jobSalary').value = j.salary||'';
+    document.getElementById('jobApplyDate').value = j.applyDate||'';
+    document.getElementById('jobStatus').value = j.status||'投递';
+    document.getElementById('jobFollowDate').value = j.followDate||'';
+    document.getElementById('jobFeedback').value = j.feedback||'';
+  } else {
+    document.getElementById('jobModalTitle').textContent = '新增投递';
+    document.getElementById('jobId').value = '';
+    document.getElementById('jobCompany').value = '';
+    document.getElementById('jobPosition').value = '';
+    document.getElementById('jobSalary').value = '';
+    document.getElementById('jobApplyDate').value = todayStr();
+    document.getElementById('jobStatus').value = '投递';
+    document.getElementById('jobFollowDate').value = '';
+    document.getElementById('jobFeedback').value = '';
+  }
+}
+function saveJob(){
+  const company = document.getElementById('jobCompany').value.trim();
+  const position = document.getElementById('jobPosition').value.trim();
+  if(!company || !position){ alert('请填写公司名称和职位'); return; }
+  const job = {
+    id: document.getElementById('jobId').value || genId(),
+    company,
+    position,
+    salary: document.getElementById('jobSalary').value.trim(),
+    applyDate: document.getElementById('jobApplyDate').value,
+    status: document.getElementById('jobStatus').value,
+    followDate: document.getElementById('jobFollowDate').value,
+    feedback: document.getElementById('jobFeedback').value.trim()
+  };
+  const jobs = getData(KEYS.jobs);
+  const idx = jobs.findIndex(j=>j.id===job.id);
+  if(idx>=0) jobs[idx]=job; else jobs.push(job);
+  setData(KEYS.jobs, jobs);
+  closeModal('jobModal');
+  renderJobs();
+  renderToday();
+  checkBackupReminder();
+}
+function editJob(id){ openJobModal(id); }
+function deleteJob(id){
+  showConfirm('删除投递记录','确定删除这条投递记录吗？此操作不可撤销。',()=>{
+    const jobs = getData(KEYS.jobs).filter(j=>j.id!==id);
+    setData(KEYS.jobs, jobs);
+    renderJobs();
+    renderToday();
+  });
+}
+
+/* ===== Diary Module ===== */
+let selectedMood = 0;
+function renderMoodOptions(){
+  const container = document.getElementById('moodOptions');
+  container.innerHTML = [1,2,3,4,5].map(m=>`
+    <button class="mood-btn" data-mood="${m}" onclick="selectMood(${m})">
+      ${MOOD_SVGS[m]}
+      <span class="mood-btn-label">${MOOD_LABELS[m]}</span>
+    </button>
+  `).join('');
+}
+function selectMood(m){
+  selectedMood = m;
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('selected', parseInt(b.dataset.mood)===m));
+}
+function renderDayCounter(){
+  const s = getSettings();
+  document.getElementById('unemploymentStart').value = s.unemploymentStart;
+  const days = daysBetween(s.unemploymentStart, todayStr()) + 1;
+  document.getElementById('dayCount').textContent = days > 0 ? days : 0;
+  document.getElementById('daySince').textContent = '自 ' + fmtDateFull(s.unemploymentStart) + ' 起';
+}
+function saveStartDate(){
+  const s = getSettings();
+  s.unemploymentStart = document.getElementById('unemploymentStart').value;
+  setData(KEYS.settings, s);
+  renderDayCounter();
+}
+function refreshQuote(){
+  const q = QUOTES[Math.floor(Math.random()*QUOTES.length)];
+  document.getElementById('quoteText').textContent = q;
+}
+function renderDiaryCheckinStatus(){
+  const diary = getData(KEYS.diary);
+  const today = todayStr();
+  const todayEntry = diary.find(d=>d.date===today);
+  if(todayEntry){
+    document.getElementById('checkinBtn').textContent = '今日已打卡 ✓';
+    document.getElementById('checkinBtn').classList.add('done');
+    if(todayEntry.mood) selectMood(todayEntry.mood);
+    document.getElementById('achievementInput').value = todayEntry.achievement||'';
+  } else {
+    document.getElementById('checkinBtn').textContent = '完成今日打卡';
+    document.getElementById('checkinBtn').classList.remove('done');
+    selectedMood = 0;
+    document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
+    document.getElementById('achievementInput').value = '';
+  }
+}
+function submitDiary(){
+  if(!selectedMood){ alert('请先选择今天的心情'); return; }
+  const achievement = document.getElementById('achievementInput').value.trim();
+  const today = todayStr();
+  const diary = getData(KEYS.diary);
+  const idx = diary.findIndex(d=>d.date===today);
+  const entry = {id: idx>=0?diary[idx].id:genId(), date:today, mood:selectedMood, achievement};
+  if(idx>=0) diary[idx]=entry; else diary.push(entry);
+  setData(KEYS.diary, diary);
+  renderDiaryList();
+  renderDiaryCheckinStatus();
+  renderToday();
+  checkBackupReminder();
+}
+function renderDiaryList(){
+  const diary = getData(KEYS.diary);
+  const list = document.getElementById('diaryList');
+  if(diary.length===0){
+    list.innerHTML = `<div class="empty">${ICONS.empty}<div class="empty-text">还没有日记记录</div></div>`;
+    return;
+  }
+  diary.sort((a,b)=>b.date.localeCompare(a.date));
+  list.innerHTML = diary.map(d=>`
+    <div class="diary-item">
+      <div class="diary-mood">${MOOD_SVGS[d.mood]}</div>
+      <div class="diary-info">
+        <div class="diary-date">${fmtDateFull(d.date)} · ${MOOD_LABELS[d.mood]}</div>
+        <div class="diary-achievement">${d.achievement||'今日打卡'}</div>
+      </div>
+      <button class="diary-del" onclick="deleteDiary('${d.id}')">${ICONS.trash}</button>
+    </div>
+  `).join('');
+}
+function deleteDiary(id){
+  showConfirm('删除日记','确定删除这条日记吗？',()=>{
+    const diary = getData(KEYS.diary).filter(d=>d.id!==id);
+    setData(KEYS.diary, diary);
+    renderDiaryList();
+    renderDiaryCheckinStatus();
+    renderToday();
+  });
+}
+
+/* ===== Share Card ===== */
+function showShareCard(){
+  const s = getSettings();
+  const days = daysBetween(s.unemploymentStart, todayStr()) + 1;
+  const quote = document.getElementById('quoteText').textContent;
+  document.getElementById('shareDay').textContent = days > 0 ? days : 0;
+  document.getElementById('shareQuote').textContent = quote;
+  document.getElementById('shareDate').textContent = new Date().toLocaleDateString('zh-CN');
+  document.getElementById('shareOverlay').classList.add('show');
+}
+function closeShare(){ document.getElementById('shareOverlay').classList.remove('show'); }
+
+/* ===== Finance Module ===== */
+let txnType = 'expense';
+function selectTxnType(t){
+  txnType = t;
+  document.getElementById('txnType').value = t;
+  document.getElementById('typeExpense').classList.toggle('active', t==='expense');
+  document.getElementById('typeIncome').classList.toggle('active', t==='income');
+  const catSelect = document.getElementById('txnCategory');
+  if(t==='income'){
+    catSelect.innerHTML = '<option value="薪资">薪资</option><option value="失业金">失业金</option><option value="兼职">兼职</option><option value="退款">退款</option><option value="其他">其他</option>';
+  } else {
+    catSelect.innerHTML = '<option value="住房">住房</option><option value="餐饮">餐饮</option><option value="交通">交通</option><option value="求职">求职</option><option value="学习">学习</option><option value="娱乐">娱乐</option><option value="医疗">医疗</option><option value="其他">其他</option>';
+  }
+}
+function saveBudget(){
+  const s = getSettings();
+  s.monthlyBudget = parseFloat(document.getElementById('monthlyBudget').value)||0;
+  setData(KEYS.settings, s);
+  renderFinance();
+  renderToday();
+}
+function saveSavings(){
+  const s = getSettings();
+  s.savings = parseFloat(document.getElementById('savingsAmount').value)||0;
+  setData(KEYS.settings, s);
+  renderFinance();
+}
+function renderFinance(){
+  const s = getSettings();
+  document.getElementById('monthlyBudget').value = s.monthlyBudget;
+  document.getElementById('savingsAmount').value = s.savings;
+  const finance = getData(KEYS.finance);
+  const monthStr = getMonthStr(todayStr());
+  const monthTxns = finance.filter(f=>getMonthStr(f.date)===monthStr);
+  const monthExpense = monthTxns.filter(f=>f.type==='expense').reduce((s,f)=>s+f.amount,0);
+  const monthIncome = monthTxns.filter(f=>f.type==='income').reduce((s,f)=>s+f.amount,0);
+  document.getElementById('monthExpense').textContent = '¥' + monthExpense.toLocaleString();
+  document.getElementById('monthExpenseSub').textContent = '预算 ¥' + s.monthlyBudget.toLocaleString();
+  document.getElementById('monthIncome').textContent = '¥' + monthIncome.toLocaleString();
+
+  // Savings months
+  const allExpense = finance.filter(f=>f.type==='expense');
+  if(allExpense.length>0 && monthExpense>0){
+    const months = Math.floor(s.savings / monthExpense * 10) / 10;
+    document.getElementById('savingsMonths').textContent = months + ' 个月';
+  } else {
+    document.getElementById('savingsMonths').textContent = '--';
+  }
+
+  // Pie chart
+  renderExpensePie(monthTxns.filter(f=>f.type==='expense'));
+
+  // Transaction list
+  const list = document.getElementById('txnList');
+  if(finance.length===0){
+    list.innerHTML = `<div class="empty">${ICONS.empty}<div class="empty-text">还没有收支记录</div></div>`;
+    return;
+  }
+  finance.sort((a,b)=>b.date.localeCompare(a.date));
+  list.innerHTML = finance.map(f=>{
+    const bg = CAT_EMOJI_MAP[f.category] || '#F3F4F6';
+    return `
+    <div class="txn-item">
+      <div class="txn-cat" style="background:${bg}">${f.category.slice(0,1)}</div>
+      <div class="txn-info">
+        <div class="txn-cat-name">${f.category}${f.note?' · '+f.note:''}</div>
+        <div class="txn-note">${fmtDateFull(f.date)}</div>
+      </div>
+      <div class="txn-amount ${f.type}">${f.type==='expense'?'-':'+'}¥${f.amount.toLocaleString()}</div>
+      <button class="txn-del" onclick="deleteTxn('${f.id}')">${ICONS.trash}</button>
+    </div>`;
+  }).join('');
+}
+function renderExpensePie(expenses){
+  const svg = document.getElementById('expensePie');
+  const legend = document.getElementById('pieLegend');
+  if(expenses.length===0){
+    svg.innerHTML = '<circle cx="60" cy="60" r="50" fill="none" stroke="#F3F4F6" stroke-width="20"/><text x="60" y="65" text-anchor="middle" fill="#9CA3AF" font-size="12">暂无支出</text>';
+    legend.innerHTML = '';
+    return;
+  }
+  // Group by category
+  const cats = {};
+  expenses.forEach(f=>{ cats[f.category] = (cats[f.category]||0) + f.amount; });
+  const total = Object.values(cats).reduce((a,b)=>a+b,0);
+  const colors = ['#F59E0B','#EF4444','#3B82F6','#8B5CF6','#10B981','#EC4899','#6366F1','#6B7280'];
+  let offset = 0;
+  let circles = `<circle cx="60" cy="60" r="50" fill="none" stroke="#F3F4F6" stroke-width="20"/>`;
+  let legends = '';
+  let colorIdx = 0;
+  Object.entries(cats).sort((a,b)=>b[1]-a[1]).forEach(([cat,amt])=>{
+    const pct = amt/total;
+    const dash = pct * 314.16; // 2*PI*50
+    const color = colors[colorIdx % colors.length];
+    circles += `<circle cx="60" cy="60" r="50" fill="none" stroke="${color}" stroke-width="20" stroke-dasharray="${dash} 314.16" stroke-dashoffset="${-offset}" transform="rotate(-90 60 60)"/>`;
+    legends += `<div class="pie-legend-item"><div class="pie-legend-dot" style="background:${color}"></div>${cat} ¥${amt.toLocaleString()} (${Math.round(pct*100)}%)</div>`;
+    offset += dash;
+    colorIdx++;
+  });
+  svg.innerHTML = circles + `<text x="60" y="58" text-anchor="middle" fill="#1F2937" font-size="14" font-weight="700">¥${total>=10000?(total/10000).toFixed(1)+'万':total.toLocaleString()}</text><text x="60" y="72" text-anchor="middle" fill="#9CA3AF" font-size="10">本月支出</text>`;
+  legend.innerHTML = legends;
+}
+function openFinanceModal(){
+  document.getElementById('financeModal').classList.add('show');
+  document.getElementById('txnAmount').value = '';
+  document.getElementById('txnDate').value = todayStr();
+  document.getElementById('txnNote').value = '';
+  selectTxnType('expense');
+}
+function saveTxn(){
+  const amount = parseFloat(document.getElementById('txnAmount').value);
+  if(!amount || amount<=0){ alert('请输入有效金额'); return; }
+  const txn = {
+    id: genId(),
+    type: document.getElementById('txnType').value,
+    amount,
+    category: document.getElementById('txnCategory').value,
+    date: document.getElementById('txnDate').value,
+    note: document.getElementById('txnNote').value.trim()
+  };
+  const finance = getData(KEYS.finance);
+  finance.push(txn);
+  setData(KEYS.finance, finance);
+  closeModal('financeModal');
+  renderFinance();
+  renderToday();
+  checkBackupReminder();
+}
+function deleteTxn(id){
+  showConfirm('删除记录','确定删除这条收支记录吗？',()=>{
+    const finance = getData(KEYS.finance).filter(f=>f.id!==id);
+    setData(KEYS.finance, finance);
+    renderFinance();
+    renderToday();
+  });
+}
+function exportCSV(){
+  const finance = getData(KEYS.finance);
+  if(finance.length===0){ alert('没有数据可导出'); return; }
+  let csv = '\uFEFF日期,类型,金额,分类,备注\n';
+  finance.forEach(f=>{
+    csv += `${f.date},${f.type==='expense'?'支出':'收入'},${f.amount},${f.category},${f.note||''}\n`;
+  });
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '失业互助台-收支记录-'+todayStr()+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ===== Skills Module ===== */
+function renderSkills(){
+  const skills = getData(KEYS.skills);
+  const list = document.getElementById('skillList');
+  const today = todayStr();
+  if(skills.length===0){
+    list.innerHTML = `<div class="empty">${ICONS.empty}<div class="empty-text">还没有学习计划，点击「新增计划」开始</div></div>`;
+    return;
+  }
+  list.innerHTML = skills.map(s=>{
+    const pct = s.target>0 ? Math.min(100, Math.round(s.current/s.target*100)) : 0;
+    const streak = calcStreak(s.checkins||{});
+    const checkedToday = s.checkins && s.checkins[today];
+    // Heatmap (last 14 days)
+    let heatHTML = '';
+    for(let i=13;i>=0;i--){
+      const d = new Date(); d.setDate(d.getDate()-i);
+      const ds = d.toISOString().slice(0,10);
+      const v = (s.checkins||{})[ds];
+      const cls = v ? 'l'+Math.min(4, Math.ceil(streak/3)||1) : '';
+      heatHTML += `<div class="heat-cell ${v?cls:''}"></div>`;
+    }
+    return `
+    <div class="skill-card">
+      <div class="skill-header">
+        <div>
+          <div class="skill-name">${s.name}</div>
+          <div class="skill-type">${s.type}${s.dailyGoal?' · '+s.dailyGoal:''}</div>
+        </div>
+        <div class="skill-streak">${ICONS.fire} ${streak}天连续</div>
+      </div>
+      ${s.target>0?`
+        <div class="skill-progress-bar"><div class="skill-progress-fill" style="width:${pct}%"></div></div>
+        <div class="skill-progress-text"><span>${s.current} / ${s.target}</span><span>${pct}%</span></div>
+      `:''}
+      <div class="skill-heatmap">${heatHTML}</div>
+      <div class="skill-actions">
+        <button class="btn-checkin-skill ${checkedToday?'done':''}" onclick="checkinSkill('${s.id}')">${checkedToday?'今日已打卡':'今日打卡'}</button>
+        <button class="btn-edit-skill" onclick="editSkill('${s.id}')">编辑</button>
+        <button class="btn-del-skill" onclick="deleteSkill('${s.id}')">删除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function calcStreak(checkins){
+  let streak = 0;
+  let d = new Date();
+  // Check today first
+  const today = todayStr();
+  if(!checkins[today]){
+    d.setDate(d.getDate()-1);
+  }
+  while(true){
+    const ds = d.toISOString().slice(0,10);
+    if(checkins[ds]){ streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+function checkinSkill(id){
+  const skills = getData(KEYS.skills);
+  const s = skills.find(x=>x.id===id);
+  if(!s) return;
+  const today = todayStr();
+  if(!s.checkins) s.checkins = {};
+  if(s.checkins[today]){
+    delete s.checkins[today];
+  } else {
+    s.checkins[today] = 1;
+    if(s.target>0) s.current = Math.min(s.target, s.current+1);
+  }
+  setData(KEYS.skills, skills);
+  renderSkills();
+  renderToday();
+  checkBackupReminder();
+}
+function openSkillModal(id){
+  document.getElementById('skillModal').classList.add('show');
+  if(id){
+    const skills = getData(KEYS.skills);
+    const s = skills.find(x=>x.id===id);
+    if(!s) return;
+    document.getElementById('skillModalTitle').textContent = '编辑学习计划';
+    document.getElementById('skillId').value = s.id;
+    document.getElementById('skillName').value = s.name||'';
+    document.getElementById('skillType').value = s.type||'其他';
+    document.getElementById('skillCurrent').value = s.current||0;
+    document.getElementById('skillTarget').value = s.target||0;
+    document.getElementById('skillDailyGoal').value = s.dailyGoal||'';
+  } else {
+    document.getElementById('skillModalTitle').textContent = '新增学习计划';
+    document.getElementById('skillId').value = '';
+    document.getElementById('skillName').value = '';
+    document.getElementById('skillType').value = '刷题';
+    document.getElementById('skillCurrent').value = '';
+    document.getElementById('skillTarget').value = '';
+    document.getElementById('skillDailyGoal').value = '';
+  }
+}
+function saveSkill(){
+  const name = document.getElementById('skillName').value.trim();
+  if(!name){ alert('请填写计划名称'); return; }
+  const skill = {
+    id: document.getElementById('skillId').value || genId(),
+    name,
+    type: document.getElementById('skillType').value,
+    current: parseInt(document.getElementById('skillCurrent').value)||0,
+    target: parseInt(document.getElementById('skillTarget').value)||0,
+    dailyGoal: document.getElementById('skillDailyGoal').value.trim(),
+    checkins: {}
+  };
+  const skills = getData(KEYS.skills);
+  const idx = skills.findIndex(s=>s.id===skill.id);
+  if(idx>=0){
+    skill.checkins = skills[idx].checkins || {};
+    skills[idx] = skill;
+  } else {
+    skills.push(skill);
+  }
+  setData(KEYS.skills, skills);
+  closeModal('skillModal');
+  renderSkills();
+  renderToday();
+  checkBackupReminder();
+}
+function editSkill(id){ openSkillModal(id); }
+function deleteSkill(id){
+  showConfirm('删除学习计划','确定删除这个学习计划吗？打卡记录也会一并删除。',()=>{
+    const skills = getData(KEYS.skills).filter(s=>s.id!==id);
+    setData(KEYS.skills, skills);
+    renderSkills();
+    renderToday();
+  });
+}
+
+/* ===== Modals ===== */
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function showConfirm(title,text,callback){
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmText').textContent = text;
+  document.getElementById('confirmOverlay').classList.add('show');
+  document.getElementById('confirmYes').onclick = function(){
+    closeConfirm();
+    callback();
+  };
+}
+function closeConfirm(){ document.getElementById('confirmOverlay').classList.remove('show'); }
+
+/* ===== Export / Import ===== */
+function exportJSON(){
+  const data = {
+    jobs: getData(KEYS.jobs),
+    diary: getData(KEYS.diary),
+    finance: getData(KEYS.finance),
+    skills: getData(KEYS.skills),
+    settings: getSettings(),
+    exportDate: new Date().toISOString(),
+    version: '1.0'
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '失业互助台-备份-'+todayStr()+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importJSON(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = JSON.parse(e.target.result);
+      showConfirm('导入数据',`即将导入备份文件，当前数据将被覆盖。导入内容：${(data.jobs||[]).length}条求职、${(data.diary||[]).length}条日记、${(data.finance||[]).length}条收支、${(data.skills||[]).length}条学习计划。确认导入？`,()=>{
+        if(data.jobs) setData(KEYS.jobs, data.jobs);
+        if(data.diary) setData(KEYS.diary, data.diary);
+        if(data.finance) setData(KEYS.finance, data.finance);
+        if(data.skills) setData(KEYS.skills, data.skills);
+        if(data.settings) setData(KEYS.settings, data.settings);
+        renderAll();
+        alert('导入成功！');
+      });
+    }catch(err){
+      alert('导入失败：文件格式错误');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+/* ===== Backup Reminder ===== */
+function checkBackupReminder(){
+  const total = getData(KEYS.jobs).length + getData(KEYS.diary).length + getData(KEYS.finance).length + getData(KEYS.skills).length;
+  const reminder = document.getElementById('backupReminder');
+  if(total >= 30){
+    reminder.style.display = 'block';
+    reminder.textContent = `数据已积累 ${total} 条，建议点击右上角「导出备份」保存一份副本`;
+  } else {
+    reminder.style.display = 'none';
+  }
+}
+
+/* ===== Clear Sample Data ===== */
+function clearSampleData(){
+  showConfirm('清空示例数据','将删除所有预置示例数据，此操作不可撤销。确认清空？',()=>{
+    Object.keys(KEYS).forEach(k=>localStorage.removeItem(KEYS[k]));
+    initSampleData();
+    setData(KEYS.jobs,[]);
+    setData(KEYS.diary,[]);
+    setData(KEYS.finance,[]);
+    setData(KEYS.skills,[]);
+    renderAll();
+  });
+}
+
+/* ===== Render All ===== */
+function renderAll(){
+  renderToday();
+  renderJobs();
+  renderMoodOptions();
+  renderDayCounter();
+  refreshQuote();
+  renderDiaryCheckinStatus();
+  renderDiaryList();
+  renderFinance();
+  renderSkills();
+  checkBackupReminder();
+}
+
+/* ===== Init ===== */
+(function init(){
+  // Check if first visit
+  if(!localStorage.getItem(KEYS.settings)){
+    initSampleData();
+  } else {
+    // Ensure settings exist
+    const s = getSettings();
+    setData(KEYS.settings, s);
+  }
+  renderAll();
+
+  // Close modals on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(m=>{
+    m.addEventListener('click',function(e){
+      if(e.target === m) m.classList.remove('show');
+    });
+  });
+  document.getElementById('confirmOverlay').addEventListener('click',function(e){
+    if(e.target === this) closeConfirm();
+  });
+  document.getElementById('shareOverlay').addEventListener('click',function(e){
+    if(e.target === this) closeShare();
+  });
+})();
+</script>
+</body>
+</html>

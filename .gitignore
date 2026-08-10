@@ -1,0 +1,9 @@
+# 部署时忽略的文件
+.env
+*.log
+__pycache__/
+*.pyc
+.workbuddy/
+nginx/certs/*
+!nginx/certs/.gitkeep
+.DS_Store
