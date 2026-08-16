@@ -13,8 +13,7 @@ from models import (
     TransactionCreate, TransactionOut,
     SkillPlanCreate, SkillPlanUpdate, SkillPlanOut,
     UserSettingsUpdate, UserSettingsOut,
-    SubscribeRequest, StandardResponse,
-)
+    SubscribeRequest, FeedbackRequest, StandardResponse,)
 
 # ═══════════════════════════════════════
 # 失业日记
@@ -340,3 +339,21 @@ def subscribe(body: SubscribeRequest):
         )
         _ = cur.fetchone()
     return StandardResponse(success=True, message="订阅成功！每周一将为你发送就业简报。")
+
+
+# ═══════════════════════════════════════
+# 反馈
+# ═══════════════════════════════════════
+feedback_router = APIRouter(prefix="/api/feedback", tags=["反馈"])
+
+
+@feedback_router.post("", response_model=StandardResponse, status_code=201)
+def submit_feedback(body: FeedbackRequest):
+    """匿名反馈（无需登录）"""
+    with get_cursor(commit=True) as cur:
+        cur.execute(
+            "INSERT INTO feedback (mood, message) VALUES (%s, %s) RETURNING id",
+            (body.mood, body.message or ""),
+        )
+        _ = cur.fetchone()
+    return StandardResponse(success=True, message="感谢你的反馈！")

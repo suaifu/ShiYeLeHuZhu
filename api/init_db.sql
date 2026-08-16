@@ -115,6 +115,16 @@ CREATE TABLE IF NOT EXISTS subscribers (
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ─── 反馈表（匿名反馈） ───
+CREATE TABLE IF NOT EXISTS feedback (
+    id              SERIAL PRIMARY KEY,
+    mood            VARCHAR(32) NOT NULL,
+    message         TEXT DEFAULT '',
+    created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at DESC);
+
 -- ─── 自动更新 updated_at 触发器 ───
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER AS $$

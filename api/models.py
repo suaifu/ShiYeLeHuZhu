@@ -173,6 +173,12 @@ class SubscribeRequest(BaseModel):
     email: EmailStr
 
 
+# ─── 反馈 ───
+class FeedbackRequest(BaseModel):
+    mood: str = Field(max_length=32)
+    message: str = Field(default="", max_length=2000)
+
+
 # ─── 通用响应 ───
 class StandardResponse(BaseModel):
     success: bool = True

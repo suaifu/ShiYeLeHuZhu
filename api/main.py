@@ -15,7 +15,7 @@ from routes_auth import router as auth_router
 from routes_jobs import router as jobs_router
 from routes_data import (
     diary_router, finance_router, skill_router,
-    settings_router, subscribe_router,
+    settings_router, subscribe_router, feedback_router,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
@@ -58,6 +58,7 @@ app.include_router(finance_router)
 app.include_router(skill_router)
 app.include_router(settings_router)
 app.include_router(subscribe_router)
+app.include_router(feedback_router)
 
 
 @app.get("/api/health")
@@ -66,6 +67,13 @@ def health():
     return {"status": "ok", "service": APP_NAME, "version": APP_VERSION}
 
 
+from fastapi.responses import FileResponse
+from pathlib import Path
+
 @app.get("/")
 def root():
+    """本地测试：直接返回前端页面"""
+    html_path = Path(__file__).parent.parent / "restart.html"
+    if html_path.exists():
+        return FileResponse(html_path, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
     return {"message": "重启 API", "docs": "/docs"}

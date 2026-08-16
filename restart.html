@@ -282,6 +282,27 @@
         .info-box.gold{background:rgba(201,152,46,.08);border-left-color:var(--gold)}
         .info-box.blue{background:rgba(61,122,181,.08);border-left-color:var(--blue)}
 
+        /* ── 实用资源链接网格 ── */
+        .ext-resource-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.75rem;margin-top:1.5rem}
+        .ext-resource-link{display:flex;align-items:center;gap:.7rem;padding:.9rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:.7rem;text-decoration:none;color:var(--text);font-size:.88rem;transition:all .25s}
+        .ext-resource-link:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 14px var(--shadow)}
+        .ext-resource-link svg{width:1.3rem;height:1.3rem;flex-shrink:0;color:var(--accent)}
+        .ext-resource-title{font-size:.82rem;font-weight:600;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;color:var(--text)}
+        .ext-resource-title svg{width:1rem;height:1rem;color:var(--accent)}
+
+        /* ── 反馈区块 ── */
+        .feedback-section{background:var(--bg-deep);padding:4rem 0}
+        .feedback-inner{max-width:560px;margin:0 auto;text-align:center}
+        .feedback-mood-row{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-bottom:1.2rem}
+        .feedback-mood-btn{padding:.6rem 1.2rem;background:var(--surface);border:1.5px solid var(--border);border-radius:2rem;font-size:.88rem;cursor:pointer;transition:all .2s;font-family:inherit;color:var(--text);display:flex;align-items:center;gap:.4rem}
+        .feedback-mood-btn svg{width:1rem;height:1rem}
+        .feedback-mood-btn:hover{border-color:var(--accent)}
+        .feedback-mood-btn.selected{background:var(--accent-pale);border-color:var(--accent);color:var(--accent);font-weight:600}
+        .feedback-textarea{width:100%;min-height:90px;padding:.8rem 1rem;border:1.5px solid var(--border);border-radius:.7rem;font-family:inherit;font-size:15px;resize:vertical;background:var(--surface);line-height:1.6;margin-bottom:1rem;outline:none;color:var(--text);transition:border-color .2s}
+        .feedback-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,85,58,.08)}
+        .feedback-note{font-size:.75rem;color:var(--text-light);margin-top:1rem;line-height:1.6}
+        .info-box.blue{background:rgba(61,122,181,.08);border-left-color:var(--blue)}
+
         .assess-section{background:var(--bg-deep)}
         .assess-container{max-width:800px;margin:0 auto}
         .assess-progress{display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem}
@@ -450,7 +471,7 @@
         .footer-col a:hover{color:var(--accent-soft)}
         .footer-emergency{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:.7rem;padding:1.2rem 1.5rem;margin-top:.5rem}
         .footer-emergency h6{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(240,236,228,.5);margin-bottom:.5rem}
-        .footer-emergency a{display:inline;margin-right:1.2rem;color:var(--accent-soft);font-weight:600;font-size:.85rem}
+        .footer-emergency a{display:flex;align-items:center;gap:.4rem;color:var(--accent-soft);font-weight:600;font-size:.85rem;padding:.3rem 0;text-decoration:none;transition:color .3s}.footer-emergency a:hover{color:var(--accent)}
         .footer-bottom{padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;font-size:.75rem;flex-wrap:wrap;gap:1rem}
         .footer-legal{display:flex;gap:1.5rem}
         .footer-legal a{color:rgba(240,236,228,.3);text-decoration:none;transition:color .3s}
@@ -922,17 +943,17 @@
             <button class="filter-btn" data-filter="legal">法律</button>
         </div>
         <div class="resource-grid" id="resourceGrid">
-            <a href="#panel-unemploy" class="resource-card reveal" data-category="fin"><div class="r-num">01</div><div class="r-info"><h4>失业保险金申领全指南</h4><p>累计缴纳失业保险满1年即可申领，最长可领24个月。附详细申请流程。</p><span class="r-tag tag-fin">经济保障</span></div></a>
-            <a href="#panel-social" class="resource-card reveal reveal-d1" data-category="ins"><div class="r-num">02</div><div class="r-info"><h4>灵活就业社保续缴方案</h4><p>失业期间如何以个人身份续缴社保？断缴影响与补救方法。</p><span class="r-tag tag-ins">社保指南</span></div></a>
-            <a href="#panel-training" class="resource-card reveal reveal-d2" data-category="skill"><div class="r-num">03</div><div class="r-info"><h4>免费职业技能培训项目</h4><p>人社部"职业技能提升行动"覆盖50+城市，提供IT、设计、运营等30+方向。</p><span class="r-tag tag-skill">技能提升</span></div></a>
+            <a href="javascript:void(0)" class="resource-card reveal" data-category="fin" onclick="switchPanel('panel-unemploy')"><div class="r-num">01</div><div class="r-info"><h4>失业保险金申领全指南</h4><p>累计缴纳失业保险满1年即可申领，最长可领24个月。附详细申请流程。</p><span class="r-tag tag-fin">经济保障</span></div></a>
+            <a href="javascript:void(0)" class="resource-card reveal reveal-d1" data-category="ins" onclick="switchPanel('panel-social')"><div class="r-num">02</div><div class="r-info"><h4>灵活就业社保续缴方案</h4><p>失业期间如何以个人身份续缴社保？断缴影响与补救方法。</p><span class="r-tag tag-ins">社保指南</span></div></a>
+            <a href="javascript:void(0)" class="resource-card reveal reveal-d2" data-category="skill" onclick="switchPanel('panel-training')"><div class="r-num">03</div><div class="r-info"><h4>免费职业技能培训项目</h4><p>人社部"职业技能提升行动"覆盖50+城市，提供IT、设计、运营等30+方向。</p><span class="r-tag tag-skill">技能提升</span></div></a>
             <a href="#mental" class="resource-card reveal reveal-d3" data-category="mind"><div class="r-num">04</div><div class="r-info"><h4>心理咨询与情感支持</h4><p>全国24小时心理援助热线、免费公益心理咨询平台、线上互助社群。</p><span class="r-tag tag-mind">心理支持</span></div></a>
             <a href="#toolkit" class="resource-card reveal reveal-d4" data-category="job" onclick="event.preventDefault();tkSwitch('jobs');document.getElementById('toolkit').scrollIntoView({behavior:'smooth'})"><div class="r-num">05</div><div class="r-info"><h4>简历优化与面试攻略</h4><p>如何解释职业空窗期？针对不同年龄段的求职策略、高转化率简历模板。</p><span class="r-tag tag-job">求职攻略</span></div></a>
             <a href="#toolkit" class="resource-card reveal reveal-d5" data-category="biz" onclick="event.preventDefault();showToast('info','创业指南内容筹备中，敬请期待')"><div class="r-num">06</div><div class="r-info"><h4>副业与创业起步指南</h4><p>自媒体运营、社区电商、自由职业……探索灵活就业的多种可能性。</p><span class="r-tag tag-biz">新可能</span></div></a>
-            <a href="#panel-rights" class="resource-card reveal" data-category="legal"><div class="r-num">07</div><div class="r-info"><h4>劳动者权益法律指南</h4><p>经济补偿标准(N/N+1)、违法辞退维权路径、劳动仲裁流程。</p><span class="r-tag tag-legal">法律维权</span></div></a>
+            <a href="javascript:void(0)" class="resource-card reveal" data-category="legal" onclick="switchPanel('panel-rights')"><div class="r-num">07</div><div class="r-info"><h4>劳动者权益法律指南</h4><p>经济补偿标准(N/N+1)、违法辞退维权路径、劳动仲裁流程。</p><span class="r-tag tag-legal">法律维权</span></div></a>
             <a href="#assess" class="resource-card reveal reveal-d1" data-category="job"><div class="r-num">08</div><div class="r-info"><h4>职业转型路径规划</h4><p>转行评估框架、热门转型方向、可迁移技能梳理、行业薪资对照表。</p><span class="r-tag tag-career">转型规划</span></div></a>
         </div>
 
-        <div class="resource-expand">
+        <div class="resource-expand" id="expand-panels">
             <div class="expand-tabs">
                 <button class="expand-tab active" data-panel="unemploy">失业保险详解</button>
                 <button class="expand-tab" data-panel="social">社保续缴方案</button>
@@ -974,6 +995,23 @@
                 <h4>维权路径</h4>
                 <ul><li>第一步：与用人单位协商</li><li>第二步：向劳动监察大队投诉（<a href="tel:12333">12333</a>热线）</li><li>第三步：申请劳动仲裁（免费，一年时效）</li><li>第四步：对仲裁不服可向法院起诉</li></ul>
                 <div class="info-box"><strong>证据保存：</strong>劳动合同、工资条、考勤记录、工作邮件、离职通知书等都是重要证据。离职前请务必做好备份。</div>
+            </div>
+        </div>
+
+        <!-- 实用资源链接 -->
+        <div class="resource-expand" id="ext-resources">
+            <div class="ext-resource-title"><svg class="ico"><use href="#i-globe"/></svg> 实用资源链接</div>
+            <div class="ext-resource-grid">
+                <a class="ext-resource-link" href="https://si.12333.gov.cn/" target="_blank" rel="noopener"><svg class="ico"><use href="#i-shield"/></svg> 国家社保服务平台</a>
+                <a class="ext-resource-link" href="https://www.mohrss.gov.cn/" target="_blank" rel="noopener"><svg class="ico"><use href="#i-clipboard"/></svg> 人社部</a>
+                <a class="ext-resource-link" href="https://www.icourse163.org/" target="_blank" rel="noopener"><svg class="ico"><use href="#i-books"/></svg> 中国大学MOOC</a>
+                <a class="ext-resource-link" href="https://study.163.com/" target="_blank" rel="noopener"><svg class="ico"><use href="#i-books"/></svg> 网易云课堂</a>
+                <a class="ext-resource-link" href="https://www.coursera.org/" target="_blank" rel="noopener"><svg class="ico"><use href="#i-globe"/></svg> Coursera</a>
+                <a class="ext-resource-link" href="https://www.edx.org/" target="_blank" rel="noopener"><svg class="ico"><use href="#i-globe"/></svg> edX</a>
+                <a class="ext-resource-link" href="https://www.zhipin.com/" target="_blank" rel="noopener"><svg class="ico"><use href="#i-briefcase"/></svg> BOSS直聘</a>
+                <a class="ext-resource-link" href="https://www.liepin.com/" target="_blank" rel="noopener"><svg class="ico"><use href="#i-search"/></svg> 猎聘网</a>
+                <a class="ext-resource-link" href="https://www.maimai.cn/" target="_blank" rel="noopener"><svg class="ico"><use href="#i-users"/></svg> 脉脉职场</a>
+                <a class="ext-resource-link" href="https://www.linkedin.com/" target="_blank" rel="noopener"><svg class="ico"><use href="#i-users"/></svg> LinkedIn</a>
             </div>
         </div>
     </div>
@@ -1368,6 +1406,29 @@
     </div>
 </section>
 
+<!-- FEEDBACK -->
+<section class="feedback-section" id="feedback">
+    <div class="container">
+        <div class="feedback-inner">
+            <div class="section-label">你的感受，我想知道</div>
+            <h2 class="section-title" style="font-size:1.8rem">这份指南对你有帮助吗？</h2>
+            <div class="divider"></div>
+            <p class="section-desc" style="font-size:.92rem;margin-bottom:1.5rem">告诉我你此刻的心情——完全匿名。</p>
+            <div class="feedback-mood-row" id="feedbackMoodRow">
+                <button class="feedback-mood-btn" data-mood="有帮助" onclick="selectFeedbackMood(this)"><svg class="ico"><use href="#i-heart"/></svg> 有帮助</button>
+                <button class="feedback-mood-btn" data-mood="加油中" onclick="selectFeedbackMood(this)"><svg class="ico"><use href="#i-rocket"/></svg> 加油中</button>
+                <button class="feedback-mood-btn" data-mood="还是焦虑" onclick="selectFeedbackMood(this)"><svg class="ico"><use href="#i-brain"/></svg> 还是焦虑</button>
+                <button class="feedback-mood-btn" data-mood="有建议" onclick="selectFeedbackMood(this)"><svg class="ico"><use href="#i-lightbulb"/></svg> 有建议</button>
+            </div>
+            <textarea class="feedback-textarea" id="feedbackMessage" placeholder="有什么想说的？（选填）"></textarea>
+            <div>
+                <button class="btn btn-primary" id="feedbackSubmitBtn" onclick="submitFeedback()">匿名发送</button>
+            </div>
+            <p class="feedback-note">你的反馈完全匿名，仅用于改进平台内容。不保存任何个人身份信息。</p>
+        </div>
+    </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
     <div class="container">
@@ -1381,10 +1442,10 @@
                     <a href="tel:12333">人社热线 12333</a>
                 </div>
             </div>
-            <div class="footer-col"><h5>经济保障</h5><a href="#panel-unemploy">失业保险申领</a><a href="#panel-social">社保续缴指南</a><a href="#panel-unemploy" onclick="event.preventDefault();document.getElementById('panel-unemploy').scrollIntoView({behavior:'smooth'})">创业担保贷款</a><a href="#" onclick="event.preventDefault();showToast('info','临时救助政策内容筹备中')">临时救助政策</a></div>
-            <div class="footer-col"><h5>能力提升</h5><a href="#panel-training">免费培训课程</a><a href="#toolkit" onclick="event.preventDefault();tkSwitch('jobs');document.getElementById('toolkit').scrollIntoView({behavior:'smooth'})">简历优化指南</a><a href="#" onclick="event.preventDefault();showToast('info','面试技巧内容筹备中')">面试技巧</a><a href="#assess">职业转型规划</a></div>
+            <div class="footer-col"><h5>经济保障</h5><a href="javascript:void(0)" onclick="switchPanel('panel-unemploy')">失业保险申领</a><a href="javascript:void(0)" onclick="switchPanel('panel-social')">社保续缴指南</a><a href="javascript:void(0)" onclick="switchPanel('panel-unemploy')">创业担保贷款</a><a href="#" onclick="event.preventDefault();showToast('info','临时救助政策内容筹备中')">临时救助政策</a></div>
+            <div class="footer-col"><h5>能力提升</h5><a href="javascript:void(0)" onclick="switchPanel('panel-training')">免费培训课程</a><a href="#toolkit" onclick="event.preventDefault();tkSwitch('jobs');document.getElementById('toolkit').scrollIntoView({behavior:'smooth'})">简历优化指南</a><a href="#" onclick="event.preventDefault();showToast('info','面试技巧内容筹备中')">面试技巧</a><a href="#assess">职业转型规划</a></div>
             <div class="footer-col"><h5>心理支持</h5><a href="#mental">心理援助热线</a><a href="#mental">心理自救指南</a><a href="#community">互助社群</a></div>
-            <div class="footer-col"><h5>关于</h5><a href="#" onclick="event.preventDefault();showToast('info','平台介绍页面筹备中')">平台介绍</a><a href="#cta" onclick="event.preventDefault();document.getElementById('cta').scrollIntoView({behavior:'smooth'})">加入志愿者</a><a href="#" onclick="event.preventDefault();showToast('info','反馈通道筹备中，欢迎邮件至 feedback@restart.org')">意见反馈</a><a href="#" onclick="event.preventDefault();showToast('info','数据来源已在各数据点旁标注')">数据来源声明</a></div>
+            <div class="footer-col"><h5>关于</h5><a href="#" onclick="event.preventDefault();showToast('info','平台介绍页面筹备中')">平台介绍</a><a href="#cta" onclick="event.preventDefault();document.getElementById('cta').scrollIntoView({behavior:'smooth'})">加入志愿者</a><a href="#" onclick="event.preventDefault();showToast('info','反馈通道筹备中，欢迎邮件至 sfguo@guoshuaifu.cn')">意见反馈</a><a href="#" onclick="event.preventDefault();showToast('info','数据来源已在各数据点旁标注')">数据来源声明</a></div>
         </div>
         <div class="footer-bottom">
             <span>重启 RESTART &copy; 2025 · 公益平台 · 内容仅供参考</span>
@@ -1523,6 +1584,22 @@ document.querySelectorAll('.expand-tab').forEach(tab => tab.addEventListener('cl
     document.getElementById('panel-'+tab.dataset.panel).classList.add('active');
 }));
 
+// 资源卡片跳转到对应面板（切换 tab + 滚动定位）
+function switchPanel(panelId){
+    const panelName = panelId.replace('panel-','');
+    // 切换 tab 高亮
+    document.querySelectorAll('.expand-tab').forEach(t=>t.classList.toggle('active', t.dataset.panel === panelName));
+    // 切换面板显示
+    document.querySelectorAll('.expand-panel').forEach(p=>p.classList.toggle('active', p.id === panelId));
+    // 滚动定位到展开面板区（含 sticky nav 偏移补偿）
+    const target = document.getElementById('expand-panels');
+    if(target){
+        const navH = 70; // 顶部固定导航栏高度
+        const y = target.getBoundingClientRect().top + window.pageYOffset - navH;
+        window.scrollTo({top: y, behavior: 'smooth'});
+    }
+}
+
 // ── RESOURCE FILTER ──
 document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
@@ -1607,7 +1684,7 @@ async function doLogin(){const email=document.getElementById('loginEmail').value
 async function doRegister(){const email=document.getElementById('regEmail').value.trim(),pwd=document.getElementById('regPassword').value,nick=document.getElementById('regNickname').value.trim();const errEl=document.getElementById('registerError'),btn=document.getElementById('registerBtn');btn.disabled=true;btn.textContent='注册中...';errEl.classList.remove('show');try{const data=await api('/auth/register',{method:'POST',body:JSON.stringify({email,password:pwd,nickname:nick})});authToken=data.access_token;currentUser=data.user;localStorage.setItem('restart_auth_token',authToken);updateAuthUI();closeAuth();showToast('success','注册成功！欢迎加入');tkInitAfterLogin()}catch(e){errEl.textContent=e.message;errEl.classList.add('show')}finally{btn.disabled=false;btn.textContent='注册'}}
 function logout(){authToken='';currentUser=null;localStorage.removeItem('restart_auth_token');updateAuthUI();showToast('info','已退出登录');document.getElementById('tkGate').classList.add('show');document.getElementById('tkContent').classList.remove('show')}
 function updateAuthUI(){const loginBtn=document.getElementById('navLoginBtn'),userInfo=document.getElementById('navUserInfo');if(authToken&&currentUser){loginBtn.style.display='none';userInfo.style.display='flex';userInfo.classList.add('show');document.getElementById('navUserAvatar').textContent=(currentUser.nickname||currentUser.email)[0].toUpperCase();document.getElementById('navUserNickname').textContent=currentUser.nickname||currentUser.email}else{loginBtn.style.display='block';userInfo.style.display='none';userInfo.classList.remove('show')}}
-async function checkAuth(){if(!authToken){updateAuthUI();return}try{currentUser=await api('/auth/me');updateAuthUI();tkInitAfterLogin()}catch(e){logout()}}
+async function checkAuth(){if(!authToken){updateAuthUI();document.getElementById('tkGate').classList.add('show');document.getElementById('tkContent').classList.remove('show');return}try{currentUser=await api('/auth/me');updateAuthUI();tkInitAfterLogin()}catch(e){logout()}}
 function tkToday(){return new Date().toISOString().slice(0,10)}
 function tkFmtDate(d){if(!d)return'--';var dt=new Date(d);return(dt.getMonth()+1)+'/'+dt.getDate()}
 var tkSelectedMood=0,tkJobFilter='all',tkTxnType='expense';
@@ -1815,13 +1892,56 @@ function calculate(saveFlag) {
 }
 
 // ── NEWSLETTER ──
-function subscribeNewsletter() {
-    const email = document.getElementById('newsletterEmail').value;
-    if (email && email.includes('@')) {
-        showToast('success','订阅成功！每周一将为你发送就业简报。');
-        document.getElementById('newsletterEmail').value = '';
-    } else {
+async function subscribeNewsletter() {
+    const email = document.getElementById('newsletterEmail').value.trim();
+    const btn = document.querySelector('.newsletter-form .btn');
+    if (!email || !email.includes('@')) {
         showToast('error','请输入有效的邮箱地址。');
+        return;
+    }
+    if (btn) { btn.disabled = true; btn.textContent = '订阅中...'; }
+    try {
+        const res = await fetch('/api/subscribe', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email: email})
+        });
+        const data = await res.json();
+        if (res.ok) {
+            showToast('success', data.message || '订阅成功！');
+            document.getElementById('newsletterEmail').value = '';
+        } else {
+            showToast('error', data.detail || '订阅失败，请重试');
+        }
+    } catch(e) {
+        showToast('error', '网络错误，请检查服务是否运行');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '订阅'; }
+    }
+}
+
+// ── 反馈 ──
+let feedbackMood = '';
+function selectFeedbackMood(btn){
+    feedbackMood = btn.dataset.mood;
+    document.querySelectorAll('#feedbackMoodRow .feedback-mood-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+}
+async function submitFeedback(){
+    if(!feedbackMood){ showToast('error','请先选择你的心情'); return; }
+    const message = document.getElementById('feedbackMessage').value.trim();
+    const btn = document.getElementById('feedbackSubmitBtn');
+    btn.disabled = true; btn.textContent = '发送中...';
+    try{
+        await api('/feedback',{method:'POST',body:JSON.stringify({mood:feedbackMood,message:message})});
+        showToast('success','感谢你的反馈！');
+        feedbackMood = '';
+        document.querySelectorAll('#feedbackMoodRow .feedback-mood-btn').forEach(b=>b.classList.remove('selected'));
+        document.getElementById('feedbackMessage').value = '';
+    }catch(e){
+        showToast('error','反馈提交失败，请稍后重试');
+    }finally{
+        btn.disabled = false; btn.textContent = '匿名发送';
     }
 }
 
