@@ -14,6 +14,9 @@ from models import (
     SkillPlanCreate, SkillPlanUpdate, SkillPlanOut,
     UserSettingsUpdate, UserSettingsOut,
     SubscribeRequest, FeedbackRequest, StandardResponse,)
+import logging
+
+logger = logging.getLogger(__name__)
 
 # ═══════════════════════════════════════
 # 失业日记
@@ -52,6 +55,7 @@ def create_diary(body: DiaryCreate, user: UserOut = Depends(get_current_user)):
             (user.id, body.entry_date, body.mood.value, body.achievement),
         )
         r = cur.fetchone()
+    logger.info(f"日记新增/更新: user={user.id} date={body.entry_date} mood={body.mood}")
     return DiaryOut(id=r[0], entry_date=r[1], mood=r[2], achievement=r[3], created_at=r[4])
 
 
@@ -139,6 +143,7 @@ def create_transaction(body: TransactionCreate, user: UserOut = Depends(get_curr
             (user.id, body.txn_type.value, body.amount, body.category, body.txn_date, body.note),
         )
         r = cur.fetchone()
+    logger.info(f"收支记录新增: user={user.id} type={body.txn_type} amount={body.amount} category={body.category}")
     return TransactionOut(
         id=r[0], txn_type=r[1], amount=float(r[2]), category=r[3],
         txn_date=r[4], note=r[5], created_at=r[6]
@@ -220,6 +225,7 @@ def create_skill(body: SkillPlanCreate, user: UserOut = Depends(get_current_user
             (user.id, body.name, body.skill_type, body.current_progress, body.target_total, body.daily_goal),
         )
         r = cur.fetchone()
+    logger.info(f"技能计划新增: user={user.id} name={body.name} type={body.skill_type}")
     return SkillPlanOut(id=r[0], name=r[1], skill_type=r[2], current_progress=r[3],
                         target_total=r[4], daily_goal=r[5], created_at=r[6])
 
@@ -263,6 +269,7 @@ def checkin_skill(skill_id: int, user: UserOut = Depends(get_current_user)):
             cur.execute("DELETE FROM skill_checkins WHERE id = %s", (existing[0],))
             if plan[1] > 0:
                 cur.execute("UPDATE skill_plans SET current_progress = GREATEST(0, current_progress - 1) WHERE id = %s", (skill_id,))
+            logger.info(f"技能打卡取消: user={user.id} skill_id={skill_id}")
             return {"checked_in": False, "message": "已取消打卡"}
         else:
             # 打卡
@@ -272,6 +279,7 @@ def checkin_skill(skill_id: int, user: UserOut = Depends(get_current_user)):
             )
             if plan[1] > 0 and plan[2] < plan[1]:
                 cur.execute("UPDATE skill_plans SET current_progress = current_progress + 1 WHERE id = %s", (skill_id,))
+            logger.info(f"技能打卡成功: user={user.id} skill_id={skill_id}")
             return {"checked_in": True, "message": "打卡成功"}
 
 
@@ -338,6 +346,7 @@ def subscribe(body: SubscribeRequest):
             (body.email,),
         )
         _ = cur.fetchone()
+    logger.info(f"新订阅: {body.email}")
     return StandardResponse(success=True, message="订阅成功！每周一将为你发送就业简报。")
 
 
@@ -356,4 +365,5 @@ def submit_feedback(body: FeedbackRequest):
             (body.mood, body.message or ""),
         )
         _ = cur.fetchone()
+    logger.info(f"新反馈: mood={body.mood}")
     return StandardResponse(success=True, message="感谢你的反馈！")

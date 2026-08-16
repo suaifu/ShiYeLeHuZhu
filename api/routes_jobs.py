@@ -12,6 +12,9 @@ from typing import Optional
 from database import get_cursor
 from auth import get_current_user
 from models import UserOut, JobApplicationCreate, JobApplicationUpdate, JobApplicationOut
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/jobs", tags=["求职追踪"])
 
@@ -75,6 +78,7 @@ def create_job(body: JobApplicationCreate, user: UserOut = Depends(get_current_u
              body.apply_date, body.follow_date, body.feedback),
         )
         r = cur.fetchone()
+    logger.info(f"求职记录新增: user={user.id} company={body.company} position={body.position}")
     return JobApplicationOut(
         id=r[0], company=r[1], position=r[2], salary=r[3], status=r[4],
         apply_date=r[5], follow_date=r[6], feedback=r[7], created_at=r[8]
@@ -102,6 +106,7 @@ def update_job(job_id: int, body: JobApplicationUpdate, user: UserOut = Depends(
         r = cur.fetchone()
     if r is None:
         raise HTTPException(404, "记录不存在")
+    logger.info(f"求职记录更新: user={user.id} job_id={job_id} fields={list(updates.keys())}")
     return JobApplicationOut(
         id=r[0], company=r[1], position=r[2], salary=r[3], status=r[4],
         apply_date=r[5], follow_date=r[6], feedback=r[7], created_at=r[8]
@@ -118,3 +123,4 @@ def delete_job(job_id: int, user: UserOut = Depends(get_current_user)):
         )
         if cur.rowcount == 0:
             raise HTTPException(404, "记录不存在")
+    logger.info(f"求职记录删除: user={user.id} job_id={job_id}")

@@ -28,7 +28,8 @@ def verify_password(plain: str, hashed: str) -> bool:
     """验证密码"""
     try:
         return bcrypt.checkpw(plain.encode('utf-8'), hashed.encode('utf-8'))
-    except Exception:
+    except Exception as e:
+        logger.warning(f"密码验证异常: {e}")
         return False
 
 
@@ -47,7 +48,8 @@ def decode_token(token: str) -> dict:
     """解码 JWT token"""
     try:
         return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-    except JWTError:
+    except JWTError as e:
+        logger.warning(f"JWT 解码失败: {e}")
         return None
 
 
@@ -60,12 +62,14 @@ async def get_current_user(
     """
     payload = decode_token(credentials.credentials)
     if payload is None:
+        logger.warning(f"认证失败: token 无效")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token 无效或已过期",
         )
     user_id = int(payload.get("sub", 0))
     if user_id == 0:
+        logger.warning("认证失败: token 缺少 sub")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token 无效",
@@ -77,6 +81,7 @@ async def get_current_user(
         )
         row = cur.fetchone()
     if row is None:
+        logger.warning(f"认证失败: user_id={user_id} 不存在或已禁用")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="用户不存在或已禁用",

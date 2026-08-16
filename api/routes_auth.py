@@ -9,6 +9,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from database import get_cursor
 from auth import hash_password, verify_password, create_token, get_current_user
 from models import UserRegister, UserLogin, Token, UserOut
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/auth", tags=["认证"])
 
@@ -20,6 +23,7 @@ def register(body: UserRegister):
         # 检查邮箱是否已注册
         cur.execute("SELECT id FROM users WHERE email = %s", (body.email,))
         if cur.fetchone():
+            logger.warning(f"注册失败: 邮箱已存在 {body.email}")
             raise HTTPException(400, "该邮箱已注册")
         # 创建用户
         cur.execute(
@@ -34,6 +38,7 @@ def register(body: UserRegister):
             (user_id,),
         )
     token = create_token(user_id, body.email)
+    logger.info(f"新用户注册成功: id={user_id} email={body.email}")
     return Token(
         access_token=token,
         user=UserOut(id=user_id, email=body.email, nickname=body.nickname or body.email.split("@")[0], created_at=created_at),
@@ -50,11 +55,14 @@ def login(body: UserLogin):
         )
         row = cur.fetchone()
     if row is None:
+        logger.warning(f"登录失败: 用户不存在 {body.email}")
         raise HTTPException(401, "邮箱或密码错误")
     user_id, email, nickname, pwd_hash, created_at = row
     if not verify_password(body.password, pwd_hash):
+        logger.warning(f"登录失败: 密码错误 user_id={user_id}")
         raise HTTPException(401, "邮箱或密码错误")
     token = create_token(user_id, email)
+    logger.info(f"用户登录成功: id={user_id} email={email}")
     return Token(
         access_token=token,
         user=UserOut(id=user_id, email=email, nickname=nickname, created_at=created_at),
